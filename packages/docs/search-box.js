@@ -10,9 +10,9 @@ export default {
           type: 'string',
           defaultValue: '',
           desc: {
-            'zh-CN':
+            'zhCN':
               '自定义按下enter键时，默认搜索的范围；此属性为空时，则默认在关键字范围下搜索 xxx，即生成的搜索标签为 `关键字：xxx` 【3.13.0版本新增】',
-            'en-US':
+            'enUS':
               'Customize the default search range when you press Enter. If this parameter is left blank, xxx is searched in the keyword range by default. That is, the generated search tag is `Keyword: xxx`，[Added in 3.13.0]'
           },
           demoId: 'settings'
@@ -22,8 +22,8 @@ export default {
           type: 'boolean',
           defaultValue: 'false',
           desc: {
-            'zh-CN': '是否开启标签编辑功能，（注：map 类型不支持编辑）【3.14.0新增】',
-            'en-US':
+            'zhCN': '是否开启标签编辑功能，（注：map 类型不支持编辑）【3.14.0新增】',
+            'enUS':
               'Whether to enable the tag editing function. (Note: The map type does not support editing.)[Added in 3.14.0]'
           },
           demoId: 'editable'
@@ -33,8 +33,8 @@ export default {
           type: 'string',
           defaultValue: `'默认按照关键字搜索'`,
           desc: {
-            'zh-CN': '没有筛选项时的占位文本',
-            'en-US': 'Placeholder text with no filtered items'
+            'zhCN': '没有筛选项时的占位文本',
+            'enUS': 'Placeholder text with no filtered items'
           },
           demoId: 'empty-placeholder'
         },
@@ -43,9 +43,9 @@ export default {
           type: 'string',
           defaultValue: '',
           desc: {
-            'zh-CN':
+            'zhCN':
               '配置用来识别筛选项的 id 键取值来源，默认取自 props.items 数据的 id 键，一般用于接口返回的 props.items 数据字段不匹配，但是又需要其中一个键值来识别筛选项的情况；注意：不建议使用 label/value/field 等字段，会被覆盖',
-            'en-US':
+            'enUS':
               'Source of the ID key used to identify a filtering item. The default value is the ID key of the props.items data. Generally, this parameter is used when the props.items data field returned by the interface does not match but one of the key values is required to identify a filtering item.Note: You are not advised to use the label, value, and field fields because they will be overwritten'
           },
           demoId: 'id-map-key'
@@ -56,8 +56,8 @@ export default {
           typeAnchorName: 'ISearchBoxItem',
           defaultValue: '[]',
           desc: {
-            'zh-CN': '数据项',
-            'en-US': 'Data items'
+            'zhCN': '数据项',
+            'enUS': 'Data items'
           },
           demoId: 'basic-usage'
         },
@@ -66,8 +66,8 @@ export default {
           type: 'number',
           defaultValue: '',
           desc: {
-            'zh-CN': 'input 元素的原生属性，限制输入框的长度，可配合 exceed 监听输入超出限定长度的事件【3.16.0新增】',
-            'en-US':
+            'zhCN': 'input 元素的原生属性，限制输入框的长度，可配合 exceed 监听输入超出限定长度的事件【3.16.0新增】',
+            'enUS':
               'Native attribute of the input element, which limits the length of the input box. This attribute can be used with exceed to listen to the event that the input exceeds the specified length[Added in 3.16.0]'
           },
           demoId: 'max-length'
@@ -78,8 +78,8 @@ export default {
           typeAnchorName: 'ISearchBoxTag',
           defaultValue: '[]',
           desc: {
-            'zh-CN': '选中的标签列表',
-            'en-US': 'List of selected tags'
+            'zhCN': '选中的标签列表',
+            'enUS': 'List of selected tags'
           },
           demoId: 'v-model'
         },
@@ -88,8 +88,8 @@ export default {
           type: 'string',
           defaultValue: `'999px'`,
           desc: {
-            'zh-CN': '设置下拉面板最大高度',
-            'en-US': 'Set the maximum height of the drop-down panel.'
+            'zhCN': '设置下拉面板最大高度',
+            'enUS': 'Set the maximum height of the drop-down panel.'
           },
           meta: {
             stable: '3.18.0'
@@ -102,8 +102,8 @@ export default {
           typeAnchorName: 'ISearchBoxMatchItem',
           defaultValue: '{}',
           desc: {
-            'zh-CN': '潜在项匹配，接口返回潜在匹配项的数据列表，异步或同步皆可',
-            'en-US':
+            'zhCN': '潜在项匹配，接口返回潜在匹配项的数据列表，异步或同步皆可',
+            'enUS':
               'Potential item matching. The interface returns the data list of potential matching items, which can be asynchronous or synchronous'
           },
           demoId: 'potential-options'
@@ -113,8 +113,8 @@ export default {
           type: 'Boolean',
           defaultValue: 'true',
           desc: {
-            'zh-CN': '是否显示帮助图标。3.14.0及以上版本默认显示；低于此版本默认隐藏',
-            'en-US':
+            'zhCN': '是否显示帮助图标。3.14.0及以上版本默认显示；低于此版本默认隐藏',
+            'enUS':
               'Indicates whether to display the help icon. 3.14.0 and later versions are displayed by default. Hidden by default for versions earlier than'
           },
           demoId: 'help'
@@ -124,8 +124,8 @@ export default {
           type: 'Boolean',
           defaultValue: 'true',
           desc: {
-            'zh-CN': '控制显隐面板的无数据提示',
-            'en-US': 'Controls the no-data prompt on the hidden panel'
+            'zhCN': '控制显隐面板的无数据提示',
+            'enUS': 'Controls the no-data prompt on the hidden panel'
           },
           meta: {
             stable: '3.18.0'
@@ -137,8 +137,8 @@ export default {
           type: 'string',
           defaultValue: `','`,
           desc: {
-            'zh-CN': '用于指定字符串，将输入值拆分成多个关键字，一次性生成多个标签，默认用英文逗号 "," 分隔',
-            'en-US':
+            'zhCN': '用于指定字符串，将输入值拆分成多个关键字，一次性生成多个标签，默认用英文逗号 "," 分隔',
+            'enUS':
               'Specifies a character string. The input value is split into multiple keywords. Multiple tags are generated at a time. By default, the keywords are separated by commas (,).'
           },
           meta: {
@@ -154,8 +154,8 @@ export default {
           typeAnchorName: 'ISearchBoxItem',
           defaultValue: '',
           desc: {
-            'zh-CN': '绑定值变化触发的回调函数',
-            'en-US': 'Callback function triggered by the change of the binding value'
+            'zhCN': '绑定值变化触发的回调函数',
+            'enUS': 'Callback function triggered by the change of the binding value'
           },
           demoId: 'auto-match'
         },
@@ -164,8 +164,8 @@ export default {
           type: '(n: number) => void',
           defaultValue: '',
           desc: {
-            'zh-CN': '输入值超出限定长度 [props.maxlength] 的值时触发',
-            'en-US': 'Triggered when the input value exceeds the value of [props.maxlength]'
+            'zhCN': '输入值超出限定长度 [props.maxlength] 的值时触发',
+            'enUS': 'Triggered when the input value exceeds the value of [props.maxlength]'
           },
           meta: {
             stable: '3.16.0'
@@ -177,8 +177,8 @@ export default {
           type: '(n: string) => void',
           defaultValue: '',
           desc: {
-            'zh-CN': '监听第一层级选择事件',
-            'en-US': 'Listen to the first-level selection event'
+            'zhCN': '监听第一层级选择事件',
+            'enUS': 'Listen to the first-level selection event'
           },
           meta: {
             stable: '3.18.0'
@@ -190,8 +190,8 @@ export default {
           type: '() => void',
           defaultValue: '',
           desc: {
-            'zh-CN': '点击帮助图标触发的回调函数',
-            'en-US': 'Callback function triggered by clicking the help icon'
+            'zhCN': '点击帮助图标触发的回调函数',
+            'enUS': 'Callback function triggered by clicking the help icon'
           },
           demoId: 'help'
         },
@@ -201,9 +201,8 @@ export default {
           typeAnchorName: 'ISearchBoxItem',
           defaultValue: '',
           desc: {
-            'zh-CN': '按下回车或点击搜索按钮触发搜索功能的回调函数',
-            'en-US':
-              'Callback function of the search function triggered by pressing Enter or clicking the search button'
+            'zhCN': '按下回车或点击搜索按钮触发搜索功能的回调函数',
+            'enUS': 'Callback function of the search function triggered by pressing Enter or clicking the search button'
           },
           demoId: 'auto-match'
         }

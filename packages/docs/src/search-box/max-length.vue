@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { TinySearchBox } from '@opentiny/tiny-search-box'
+import TinySearchBox from '@opentiny/vue-search-box'
 import { Modal } from '@opentiny/vue'
 
 const tags = ref([])
@@ -24,5 +24,5 @@ const handleExceed = (number) => {
 </script>
 
 <template>
-  <tvp-search-box v-model="tags" :items="dataSource" :maxlength="maxlength" @exceed="handleExceed" />
+  <tiny-search-box v-model="tags" :items="dataSource" :maxlength="maxlength" @exceed="handleExceed" />
 </template>

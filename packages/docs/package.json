@@ -1,0 +1,31 @@
+{
+  "name": "docs",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@opentiny/vue": "^3.22.0",
+    "@opentiny/vue-icon": "^3.22.0",
+    "@opentiny/vue-search-box": "^0.1.1-alpha.1",
+    "@opentiny/vue-theme": "^3.22.1",
+    "fast-glob": "^3.3.3",
+    "glob": "^11.0.0",
+    "less": "^4.2.2",
+    "less-loader": "^12.2.0",
+    "vue": "^3.0.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^4.0.0",
+    "unplugin-vue-router": "^0.12.0",
+    "vite": "^6.2.2",
+    "vite-plugin-pages": "^0.33.0"
+  }
+}

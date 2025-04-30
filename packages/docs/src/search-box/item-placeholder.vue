@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { TinySearchBox } from '@opentiny/tiny-search-box'
+import TinySearchBox from '@opentiny/vue-search-box'
 
 const items = ref([
   {
