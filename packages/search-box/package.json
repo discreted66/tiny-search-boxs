@@ -1,6 +1,6 @@
 {
-  "name": "@opentiny/vue-search-box",
-  "version": "0.1.2",
+  "name": "@discreted/vue-search-box",
+  "version": "0.1.39",
   "description": "",
   "homepage": "https://github.com/opentiny/tiny-search-box#readme",
   "bugs": {
@@ -22,7 +22,7 @@
     "main": "dist/lib/index.cjs.js",
     "module": "dist/es/index.es.js",
     "types": "dist/types/index.d.ts",
-    "style": "dist/index.less"
+    "style": "dist/index.css"
   },
   "files": ["dist"],
   "keywords": [
@@ -31,12 +31,19 @@
     "opentiny"
   ],
   "scripts": {
-    "build": "pnpm build:theme && vite build",
+    "build": "pnpm build:theme && vite build && pnpm build:webcomponent",
     "build:theme": "vite build --config vite.config.theme.ts",
+    "build:webcomponent": "vite build --config vite.config.webcomponent.ts",
     "prepublish": "node scripts/pre-release.cjs"
   },
   "peerDependencies": {
-    "vue": "^3.0.0"
+    "vue-demi": "^0.14.0",
+    "vue": "^2.0.0 || >=3.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@vue/composition-api": {
+      "optional": true
+    }
   },
   "dependencies": {
     "@opentiny/vue-button": "^3.22.0",
@@ -48,17 +55,23 @@
     "@opentiny/vue-dropdown-menu": "^3.22.0",
     "@opentiny/vue-form": "^3.22.0",
     "@opentiny/vue-form-item": "^3.22.0",
-    "@opentiny/vue-icon": "^3.22.0",
+    "@opentiny/vue-icon": "~3.26.0",
     "@opentiny/vue-input": "^3.22.0",
     "@opentiny/vue-loading": "^3.22.0",
     "@opentiny/vue-option": "^3.22.0",
     "@opentiny/vue-popover": "^3.22.0",
     "@opentiny/vue-select": "^3.22.0",
-    "@opentiny/vue-tag": "^3.22.0",
-    "@opentiny/vue-tooltip": "^3.22.0"
+    "@opentiny/vue-tag": "^3.26.0",
+    "@opentiny/vue-tooltip": "^3.22.0",
+    "@opentiny/vue-theme-saas": "^3.26.0",
+    "@opentiny/vue-theme": "^3.26.0",
+    "@opentiny/vue-design-saas": "^3.26.0",
+    "@opentiny/vue-config-provider": "^3.26.0"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.0.0",
+    "vue-demi": "^0.14.0",
+    "vite-plugin-vue2": "^1.9.2",
     "commander": "^6.2.0",
     "glob": "^11.0.0",
     "vue": "^3.0.0",

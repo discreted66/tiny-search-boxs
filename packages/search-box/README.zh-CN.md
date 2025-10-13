@@ -1,43 +1,44 @@
-# TinySearchBox
+# TinySearchBox 综合搜索组件
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 [![All Contributors](https://img.shields.io/badge/all_contributors-4-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
-TinySearchBox is a comprehensive search component based on Vue3. It uses the TinyVue component library and follows the OpenTiny design specifications. It is easy to use and powerful. It supports single selection, multiple selection, time, time range and so on.
+TinySearchBox 是一个基于 Vue3 的综合搜索组件，使用 TinyVue 组件库，遵循 OpenTiny 设计规范，简单易用、功能强大，支持单选、多选、时间、时间区间等多条件筛选。
 
-English | [简体中文](README.zh-CN.md)
+[English](README.md) | 简体中文
 
-## Advantages
+## 项目优势
 
-TinySearchBox has the following advantages:
+TinySearchBox 主要有以下特点和优势：
 
-- Gather the filtering criteria into one input box for higher filtering efficiency and a better user experience
-- Supports multiple types of conditional filtering such as single selection, multiple selection, time, time interval, number size, and number interval
-- Powerful search functions, supporting fuzzy search, custom search, etc.
+- 将筛选条件聚拢在一个输入框中，筛选效率更高、用户体验更好
+- 支持单选、多选、时间、时间区间、数字大小、数字区间等多种类型条件筛选
+- 强大的搜索功能，支持模糊搜索、自定义搜索等
 
 ![TinySearchBox](TinySearchBox.png)
 
-## Quick Start
+## 快速上手
 
-Install TinySearchBox:
+安装 TinySearchBox
 
 ```shell
 npm i @opentiny/vue-search-box
 ```
+```
 
-Import TinySearchBox:
+导入 TinySearchBox 综合搜索：
 
 ```javascript
 import TinySearchBox from '@opentiny/vue-search-box';
 ```
 
-Import styles:
+引入样式：
 
 ```css
 @import '@opentiny/vue-search-box/dist/index.css';
 ```
 
-html：
+在模板中使用：
 
 ```html
 <script setup>
@@ -89,11 +90,11 @@ html：
 </script>
 
 <template>
-  <TinySearchBox v-model="tags" :items="items"></TinySearchBox>
+  <tiny-search-box v-model="tags" :items="items"></tiny-search-box>
 </template>
 ```
 
-## Development
+## 本地开发
 
 ```shell
 git clone git@github.com:opentiny/tiny-search-box.git
@@ -102,7 +103,7 @@ pnpm i
 pnpm dev
 ```
 
-Open a browser to access：[http://localhost:5173/tiny-search-box/](http://localhost:5173/tiny-search-box/)
+打开浏览器访问：[http://localhost:5173/tiny-search-box/](http://localhost:5173/tiny-search-box/)
 
 ## License
 

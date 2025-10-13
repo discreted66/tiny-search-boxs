@@ -1,4 +1,4 @@
-import { ref, watch } from 'vue'
+import { ref, watch } from 'vue-demi'
 
 export function usePlaceholder({ props, state, t }) {
   const placeholder = ref(props.emptyPlaceholder)

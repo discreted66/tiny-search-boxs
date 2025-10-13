@@ -35,6 +35,7 @@ function rollupOutput(target: string, format: string): any {
   }
 }
 
+
 const input = glob.sync('./src/**/*.ts', {
   cwd: __dirname,
   absolute: true
@@ -42,6 +43,9 @@ const input = glob.sync('./src/**/*.ts', {
 
 export default defineConfig({
   plugins: [dts({ outDir: './dist/types' }), vue()],
+  optimizeDeps: {
+    exclude: ['vue-demi']
+  },
   build: {
     assetsDir: '',
     sourcemap: false,

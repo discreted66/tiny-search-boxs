@@ -223,7 +223,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed } from 'vue-demi'
 import TinyFormItem from '@opentiny/vue-form-item'
 import TinyDropdownItem from '@opentiny/vue-dropdown-item'
 import TinyCheckbox from '@opentiny/vue-checkbox'

@@ -1,4 +1,4 @@
-import { computed } from 'vue'
+import { computed } from 'vue-demi'
 import { hasTagItem, createNewTag, getTagId, emitChangeModelEvent } from '../utils/tag'
 import { deepClone, omitObj } from '../utils/clone'
 import { showDropdown } from '../utils/dropdown'
