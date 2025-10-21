@@ -2,7 +2,7 @@ import { ref } from 'vue'
 import { showDropdown } from '../utils/dropdown'
 import { emitChangeModelEvent } from '../utils/tag'
 
-export function useTag({ props, state, emits }) {
+export function useTag({ props, state, emit }) {
   const lastInputValue = ref(state.inputValue)
 
   const changeIsChecked = (tag) => {
@@ -19,7 +19,7 @@ export function useTag({ props, state, emits }) {
     showDropdown(state, false)
     changeIsChecked(tag)
     const newValue = props.modelValue.filter((item) => item !== tag)
-    emitChangeModelEvent({ emits, state, newValue })
+    emitChangeModelEvent({ emit, state, newValue })
   }
 
   const clearTag = () => {
@@ -27,8 +27,8 @@ export function useTag({ props, state, emits }) {
     props.modelValue.forEach((item) => changeIsChecked(item))
     state.propItem = {}
     state.inputValue = ''
-    emitChangeModelEvent({ emits, state, newValue: [] })
-    emits('clear')
+    emitChangeModelEvent({ emit, state, newValue: [] })
+    emit('clear')
   }
 
   const backspaceDeleteTag = () => {
@@ -44,7 +44,7 @@ export function useTag({ props, state, emits }) {
       const lastIndex = props.modelValue.length - 1
       changeIsChecked(props.modelValue[lastIndex])
       const newValue = state.innerModelValue.slice(0, props.modelValue.length - 1)
-      emitChangeModelEvent({ emits, state, newValue })
+      emitChangeModelEvent({ emit, state, newValue })
     }
     lastInputValue.value = state.inputValue
     state?.instance?.refs?.inputRef.$el.click()

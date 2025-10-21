@@ -33,7 +33,7 @@ const getHighlightMatch = (labelRegex, label) => {
   return match
 }
 
-export function useMatch({ props, state, emits }) {
+export function useMatch({ props, state, emit }) {
   const loadingInstance = ref(null)
 
   const getMatchList = async (keyword: string) => {
@@ -54,7 +54,7 @@ export function useMatch({ props, state, emits }) {
     const { maxlength } = props
 
     if (maxlength && maxlength < inputValue.length) {
-      emits('exceed', maxlength)
+      emit('exceed', maxlength)
       return
     }
 
@@ -184,7 +184,7 @@ export function useMatch({ props, state, emits }) {
       const id = getTagId(props, prevItem, item)
       const newTag = createNewTag({ type, field, label: propItem.label, value, ...id })
       const tagList = [newTag]
-      emitChangeModelEvent({ emits, state, tagList })
+      emitChangeModelEvent({ emit, state, tagList })
     }
     if (isFirst) {
       showDropdown(state)

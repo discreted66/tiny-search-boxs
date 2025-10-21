@@ -1,0 +1,45 @@
+{
+  "name": "vue2-test",
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview --port 4173"
+  },
+  "dependencies": {
+    "@opentiny/vue-form": "2.25.0",
+    "@opentiny/vue-icon": "2.25.0",
+    "@opentiny/vue-tag": "2.25.0",
+    "@vue/composition-api": "^1.7.2",
+    "vite-plugin-vue2": "^2.0.3",
+    "vue": "2.7.16",
+    "vue-demi": "^0.14.10",
+    "less": "4.3.0",
+    "vue-router": "^3.5.4"
+  },
+  "devDependencies": {
+    "terser": "^5.14.2",
+    "vite": "^4.0.0",
+    "vue-demi": "^0.14.10"
+  },
+  "overrides": {
+    "vue-template-compiler": "2.7.16",
+    "@opentiny/vue-button": "2.25.0",
+    "@opentiny/vue-checkbox": "2.25.0",
+    "@opentiny/vue-checkbox-group": "2.25.0",
+    "@opentiny/vue-date-picker": "2.25.0",
+    "@opentiny/vue-dropdown": "2.25.0",
+    "@opentiny/vue-dropdown-item": "2.25.0",
+    "@opentiny/vue-dropdown-menu": "2.25.0",
+    "@opentiny/vue-form-item": "2.25.0",
+    "@opentiny/vue-icon": "2.25.0",
+    "@opentiny/vue-input": "2.25.0",
+    "@opentiny/vue-loading": "2.25.0",
+    "@opentiny/vue-option": "2.25.0",
+    "@opentiny/vue-popover": "2.25.0",
+    "@opentiny/vue-select": "2.25.0",
+    "@opentiny/vue-tooltip": "2.25.0",
+    "@opentiny/vue-tag": "2.25.0",
+    "@opentiny/vue-common": "2.25.0"
+  }
+}

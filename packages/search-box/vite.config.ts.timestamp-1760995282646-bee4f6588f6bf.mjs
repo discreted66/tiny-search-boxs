@@ -1,0 +1,49 @@
+// vite.config.ts
+import { resolve } from "node:path";
+import * as glob from "file:///C:/Users/discreted66/Desktop/tiny-search-box/packages/search-box/node_modules/.pnpm/glob@11.0.3/node_modules/glob/dist/esm/index.js";
+import { defineConfig } from "file:///C:/Users/discreted66/Desktop/tiny-search-box/packages/search-box/node_modules/.pnpm/vite@4.5.14_less@4.3.0/node_modules/vite/dist/node/index.js";
+import vue from "file:///C:/Users/discreted66/Desktop/tiny-search-box/packages/search-box/node_modules/.pnpm/@vitejs+plugin-vue@4.6.2_vite@4.5.14_less@4.3.0__vue@3.5.22_typescript@5.9.3_/node_modules/@vitejs/plugin-vue/dist/index.mjs";
+import dts from "file:///C:/Users/discreted66/Desktop/tiny-search-box/packages/search-box/node_modules/.pnpm/vite-plugin-dts@4.5.4_rollup@3.29.5_typescript@5.9.3_vite@4.5.14_less@4.3.0_/node_modules/vite-plugin-dts/dist/index.mjs";
+var __vite_injected_original_dirname = "C:\\Users\\discreted66\\Desktop\\tiny-search-box\\packages\\search-box";
+function rollupOutput(target, format) {
+  return {
+    format: target,
+    entryFileNames: `[name].${target}.js`,
+    preserveModules: true,
+    dir: resolve(__vite_injected_original_dirname, "dist/vue3", format),
+    preserveModulesRoot: resolve(__vite_injected_original_dirname, "src"),
+    exports: "named"
+  };
+}
+var input = glob.sync("./src/**/*.ts", { cwd: __vite_injected_original_dirname, absolute: true });
+var vite_config_default = defineConfig({
+  plugins: [
+    dts({ outDir: "./dist/types" }),
+    vue()
+  ],
+  resolve: {
+    alias: {
+      // Vue3 不做 vue -> vue-demi 的 alias
+      // OpenTiny 直接使用 3.x 包，不做 * -> *2 的别名
+    }
+  },
+  build: {
+    assetsDir: "",
+    sourcemap: false,
+    minify: false,
+    cssCodeSplit: true,
+    rollupOptions: {
+      input,
+      treeshake: false,
+      preserveEntrySignatures: "allow-extension",
+      external: [
+        "vue"
+      ],
+      output: [rollupOutput("es", "es"), rollupOutput("cjs", "lib")]
+    }
+  }
+});
+export {
+  vite_config_default as default
+};
+//# sourceMappingURL=data:application/json;base64,ewogICJ2ZXJzaW9uIjogMywKICAic291cmNlcyI6IFsidml0ZS5jb25maWcudHMiXSwKICAic291cmNlc0NvbnRlbnQiOiBbImNvbnN0IF9fdml0ZV9pbmplY3RlZF9vcmlnaW5hbF9kaXJuYW1lID0gXCJDOlxcXFxVc2Vyc1xcXFxkaXNjcmV0ZWQ2NlxcXFxEZXNrdG9wXFxcXHRpbnktc2VhcmNoLWJveFxcXFxwYWNrYWdlc1xcXFxzZWFyY2gtYm94XCI7Y29uc3QgX192aXRlX2luamVjdGVkX29yaWdpbmFsX2ZpbGVuYW1lID0gXCJDOlxcXFxVc2Vyc1xcXFxkaXNjcmV0ZWQ2NlxcXFxEZXNrdG9wXFxcXHRpbnktc2VhcmNoLWJveFxcXFxwYWNrYWdlc1xcXFxzZWFyY2gtYm94XFxcXHZpdGUuY29uZmlnLnRzXCI7Y29uc3QgX192aXRlX2luamVjdGVkX29yaWdpbmFsX2ltcG9ydF9tZXRhX3VybCA9IFwiZmlsZTovLy9DOi9Vc2Vycy9kaXNjcmV0ZWQ2Ni9EZXNrdG9wL3Rpbnktc2VhcmNoLWJveC9wYWNrYWdlcy9zZWFyY2gtYm94L3ZpdGUuY29uZmlnLnRzXCI7aW1wb3J0IHsgcmVzb2x2ZSB9IGZyb20gJ25vZGU6cGF0aCdcclxuaW1wb3J0IHsgcmVhZEZpbGVTeW5jIH0gZnJvbSAnbm9kZTpmcydcclxuaW1wb3J0ICogYXMgZ2xvYiBmcm9tICdnbG9iJ1xyXG5pbXBvcnQgeyBkZWZpbmVDb25maWcgfSBmcm9tICd2aXRlJ1xyXG5pbXBvcnQgdnVlIGZyb20gJ0B2aXRlanMvcGx1Z2luLXZ1ZSdcclxuaW1wb3J0IGR0cyBmcm9tICd2aXRlLXBsdWdpbi1kdHMnXHJcblxyXG5pbnRlcmZhY2UgTWFuaWZlc3Qge1xyXG4gIHZlcnNpb246IHN0cmluZ1xyXG4gIGRlcGVuZGVuY2llcz86IFJlY29yZDxzdHJpbmcsIHN0cmluZz5cclxuICBwZWVyRGVwZW5kZW5jaWVzPzogUmVjb3JkPHN0cmluZywgc3RyaW5nPlxyXG59XHJcbmZ1bmN0aW9uIGdldFBhY2thZ2VNYW5pZmVzdChwa2dQYXRoOiBzdHJpbmcpOiBNYW5pZmVzdCB7XHJcbiAgcmV0dXJuIEpTT04ucGFyc2UocmVhZEZpbGVTeW5jKHBrZ1BhdGgsICd1dGY4JykpIGFzIE1hbmlmZXN0XHJcbn1cclxuZnVuY3Rpb24gcm9sbHVwRXh0ZXJuYWxGcm9tUGFja2FnZShwa2dQYXRoOiBzdHJpbmcpIHtcclxuICBjb25zdCB7IGRlcGVuZGVuY2llcywgcGVlckRlcGVuZGVuY2llcyB9ID0gZ2V0UGFja2FnZU1hbmlmZXN0KHBrZ1BhdGgpXHJcbiAgY29uc3QgZGVwcyA9IG5ldyBTZXQoW1xyXG4gICAgLi4uT2JqZWN0LmtleXMoZGVwZW5kZW5jaWVzID8/IHt9KSxcclxuICAgIC4uLk9iamVjdC5rZXlzKHBlZXJEZXBlbmRlbmNpZXMgPz8ge30pXHJcbiAgXSlcclxuICByZXR1cm4gKGlkOiBzdHJpbmcpID0+IEFycmF5LmZyb20oZGVwcykuc29tZSgocGtnKSA9PiBpZCA9PT0gcGtnIHx8IGlkLnN0YXJ0c1dpdGgoYCR7cGtnfS9gKSlcclxufVxyXG5mdW5jdGlvbiByb2xsdXBPdXRwdXQodGFyZ2V0OiBzdHJpbmcsIGZvcm1hdDogc3RyaW5nKTogYW55IHtcclxuICByZXR1cm4ge1xyXG4gICAgZm9ybWF0OiB0YXJnZXQsXHJcbiAgICBlbnRyeUZpbGVOYW1lczogYFtuYW1lXS4ke3RhcmdldH0uanNgLFxyXG4gICAgcHJlc2VydmVNb2R1bGVzOiB0cnVlLFxyXG4gICAgZGlyOiByZXNvbHZlKF9fZGlybmFtZSwgJ2Rpc3QvdnVlMycsIGZvcm1hdCksXHJcbiAgICBwcmVzZXJ2ZU1vZHVsZXNSb290OiByZXNvbHZlKF9fZGlybmFtZSwgJ3NyYycpLFxyXG4gICAgZXhwb3J0czogJ25hbWVkJ1xyXG4gIH1cclxufVxyXG5cclxuY29uc3QgaW5wdXQgPSBnbG9iLnN5bmMoJy4vc3JjLyoqLyoudHMnLCB7IGN3ZDogX19kaXJuYW1lLCBhYnNvbHV0ZTogdHJ1ZSB9KVxyXG5cclxuZXhwb3J0IGRlZmF1bHQgZGVmaW5lQ29uZmlnKHtcclxuICBwbHVnaW5zOiBbXHJcbiAgICBkdHMoeyBvdXREaXI6ICcuL2Rpc3QvdHlwZXMnIH0pLFxyXG4gICAgdnVlKClcclxuICBdLFxyXG4gIHJlc29sdmU6IHtcclxuICAgIGFsaWFzOiB7XHJcbiAgICAgIC8vIFZ1ZTMgXHU0RTBEXHU1MDVBIHZ1ZSAtPiB2dWUtZGVtaSBcdTc2ODQgYWxpYXNcclxuICAgICAgLy8gT3BlblRpbnkgXHU3NkY0XHU2M0E1XHU0RjdGXHU3NTI4IDMueCBcdTUzMDVcdUZGMENcdTRFMERcdTUwNUEgKiAtPiAqMiBcdTc2ODRcdTUyMkJcdTU0MERcclxuICAgIH1cclxuICB9LFxyXG4gIGJ1aWxkOiB7XHJcbiAgICBhc3NldHNEaXI6ICcnLFxyXG4gICAgc291cmNlbWFwOiBmYWxzZSxcclxuICAgIG1pbmlmeTogZmFsc2UsXHJcbiAgICBjc3NDb2RlU3BsaXQ6IHRydWUsXHJcbiAgICByb2xsdXBPcHRpb25zOiB7XHJcbiAgICAgIGlucHV0LFxyXG4gICAgICB0cmVlc2hha2U6IGZhbHNlLFxyXG4gICAgICBwcmVzZXJ2ZUVudHJ5U2lnbmF0dXJlczogJ2FsbG93LWV4dGVuc2lvbicsXHJcbiAgICAgIGV4dGVybmFsOiBbXHJcbiAgICAgICAgJ3Z1ZSdcclxuICAgICAgXSxcclxuICAgICAgb3V0cHV0OiBbcm9sbHVwT3V0cHV0KCdlcycsICdlcycpLCByb2xsdXBPdXRwdXQoJ2NqcycsICdsaWInKV1cclxuICAgIH1cclxuICB9XHJcbn0pXHJcbiJdLAogICJtYXBwaW5ncyI6ICI7QUFBZ1ksU0FBUyxlQUFlO0FBRXhaLFlBQVksVUFBVTtBQUN0QixTQUFTLG9CQUFvQjtBQUM3QixPQUFPLFNBQVM7QUFDaEIsT0FBTyxTQUFTO0FBTGhCLElBQU0sbUNBQW1DO0FBdUJ6QyxTQUFTLGFBQWEsUUFBZ0IsUUFBcUI7QUFDekQsU0FBTztBQUFBLElBQ0wsUUFBUTtBQUFBLElBQ1IsZ0JBQWdCLFVBQVUsTUFBTTtBQUFBLElBQ2hDLGlCQUFpQjtBQUFBLElBQ2pCLEtBQUssUUFBUSxrQ0FBVyxhQUFhLE1BQU07QUFBQSxJQUMzQyxxQkFBcUIsUUFBUSxrQ0FBVyxLQUFLO0FBQUEsSUFDN0MsU0FBUztBQUFBLEVBQ1g7QUFDRjtBQUVBLElBQU0sUUFBYSxVQUFLLGlCQUFpQixFQUFFLEtBQUssa0NBQVcsVUFBVSxLQUFLLENBQUM7QUFFM0UsSUFBTyxzQkFBUSxhQUFhO0FBQUEsRUFDMUIsU0FBUztBQUFBLElBQ1AsSUFBSSxFQUFFLFFBQVEsZUFBZSxDQUFDO0FBQUEsSUFDOUIsSUFBSTtBQUFBLEVBQ047QUFBQSxFQUNBLFNBQVM7QUFBQSxJQUNQLE9BQU87QUFBQTtBQUFBO0FBQUEsSUFHUDtBQUFBLEVBQ0Y7QUFBQSxFQUNBLE9BQU87QUFBQSxJQUNMLFdBQVc7QUFBQSxJQUNYLFdBQVc7QUFBQSxJQUNYLFFBQVE7QUFBQSxJQUNSLGNBQWM7QUFBQSxJQUNkLGVBQWU7QUFBQSxNQUNiO0FBQUEsTUFDQSxXQUFXO0FBQUEsTUFDWCx5QkFBeUI7QUFBQSxNQUN6QixVQUFVO0FBQUEsUUFDUjtBQUFBLE1BQ0Y7QUFBQSxNQUNBLFFBQVEsQ0FBQyxhQUFhLE1BQU0sSUFBSSxHQUFHLGFBQWEsT0FBTyxLQUFLLENBQUM7QUFBQSxJQUMvRDtBQUFBLEVBQ0Y7QUFDRixDQUFDOyIsCiAgIm5hbWVzIjogW10KfQo=

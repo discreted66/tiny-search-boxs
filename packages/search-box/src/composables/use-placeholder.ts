@@ -21,7 +21,7 @@ export function usePlaceholder({ props, state, t }) {
         } else if (type === 'map') {
           setPlaceholder(t('tvp.tvpSearchbox.tagPlaceholder'))
         } else if (state.backupList?.length) {
-          setPlaceholder(t('tvp.tvpSearchbox.dynamicPlaceholder', { newValue }))
+          setPlaceholder(t('tvp.tvpSearchbox.dynamicPlaceholder').replace('{newValue}', newValue))
         } else {
           setPlaceholder(t('tvp.tvpSearchbox.addPlaceholder'))
         }

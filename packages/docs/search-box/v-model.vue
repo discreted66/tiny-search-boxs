@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref ,watch} from 'vue'
 import { dataSource } from './data-source'
 
 const tags = ref([
@@ -15,6 +15,9 @@ const tags = ref([
     type: 'radio'
   }
 ])
+watch(tags, (newVal) => {
+  console.log('Selected tags:', newVal)
+})
 </script>
 
 <template>

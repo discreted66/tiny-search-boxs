@@ -1,9 +1,9 @@
-import { computed } from 'vue'
+import { computed } from 'vue-demi'
 import { hasTagItem, createNewTag, getTagId, emitChangeModelEvent } from '../utils/tag'
 import { deepClone, omitObj } from '../utils/clone'
 import { showDropdown } from '../utils/dropdown'
 
-export function useCheckbox({ props, state, emits }) {
+export function useCheckbox({ props, state, emit }) {
   const selectCheckbox = (confirm: boolean) => {
     showDropdown(state, false)
     const { checkboxGroup, prevItem, propItem } = state
@@ -58,7 +58,7 @@ export function useCheckbox({ props, state, emits }) {
           state.innerModelValue = state.innerModelValue.filter((item, index) => item && !indexList.includes(index))
         }
       }
-      emitChangeModelEvent({ emits, state, tagList, oldValue })
+      emitChangeModelEvent({ emit, state, tagList, oldValue })
     } else {
       propItem.label = ''
       state.inputValue = ''
