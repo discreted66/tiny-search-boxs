@@ -1,5 +1,318 @@
+<script setup lang="ts">
+import type { PropType } from 'vue'
+import { reactive, getCurrentInstance, watch, nextTick, onMounted, computed, onBeforeUnmount } from 'vue'
+import TinyTag from '@opentiny/vue-tag'
+import TinyInput from '@opentiny/vue-input'
+import TinyDropdown from '@opentiny/vue-dropdown'
+import TinyDropdownMenu from '@opentiny/vue-dropdown-menu'
+import TinyButton from '@opentiny/vue-button'
+import TinyTooltip from '@opentiny/vue-tooltip'
+import TinyDatePicker from '@opentiny/vue-date-picker'
+import TinyForm from '@opentiny/vue-form'
+import TinyFormItem from '@opentiny/vue-form-item'
+import TinyPopover from '@opentiny/vue-popover'
+import TinySelect from '@opentiny/vue-select'
+import TinyOption from '@opentiny/vue-option'
+import { iconSearch, iconClose, iconHelpQuery } from '@opentiny/vue-icon'
+import { format } from './utils/date.ts'
+import { t } from './index.ts'
+import { useTag } from './composables/use-tag'
+import { useDropdown } from './composables/use-dropdown'
+import { useMatch } from './composables/use-match'
+import { useCheckbox } from './composables/use-checkbox'
+import { useDatePicker } from './composables/use-datepicker'
+import { useNumRange } from './composables/use-num-range'
+import { useEdit } from './composables/use-edit'
+import { useCustom } from './composables/use-custom'
+import { useInit } from './composables/use-init'
+import { usePlaceholder } from './composables/use-placeholder'
+import type { ISearchBoxItem, ISearchBoxTag, ISearchBoxMatchOptions } from './index.type'
+import { showDropdown, showPopover } from './utils/dropdown'
+import TinySearchBoxFirstLevelPanel from './components/first-level-panel.vue'
+import TinySearchBoxSecondLevelPanel from './components/second-level-panel.vue'
+import './index.less'
+import { deepClone } from './utils/clone'
+import { resetInput } from './utils/tag'
+
+defineOptions({
+  name: 'TinySearchBox'
+})
+
+const props = defineProps({
+  modelValue: {
+    type: Array as PropType<ISearchBoxTag[]>,
+    default() {
+      return []
+    }
+  },
+  items: {
+    type: Array as PropType<ISearchBoxItem[]>,
+    default: () => []
+  },
+  emptyPlaceholder: {
+    type: String,
+    default: ''
+  },
+  potentialOptions: {
+    type: Object as PropType<ISearchBoxMatchOptions>,
+    default() {
+      return null
+    }
+  },
+  // 是否显示帮助图标，新规范默认显示
+  showHelp: {
+    type: Boolean as PropType<boolean>,
+    default: true
+  },
+  // 标签标识键
+  idMapKey: {
+    type: String,
+    default: 'id'
+  },
+  // 自定义默认搜索项
+  defaultField: {
+    type: String,
+    default: ''
+  },
+  editable: {
+    type: Boolean,
+    default: false
+  },
+  maxlength: {
+    type: Number
+  },
+  // 3.18.0新增
+  panelMaxHeight: {
+    type: String,
+    default: '999px'
+  },
+  // 3.18.0新增
+  splitInputValue: {
+    type: String,
+    default: ','
+  }
+})
+
+const emits = defineEmits(['update:modelValue', 'change', 'search', 'exceed', 'first-level-select', 'clear'])
+
+const state = reactive({
+  innerModelValue: [...props.modelValue],
+  recordItems: [] as ISearchBoxItem[],
+  groupItems: {},
+  inputValue: '',
+  matchItems: {},
+  propItem: {},
+  backupList: [],
+  filterList: [],
+  checkboxGroup: [] as string[],
+  prevItem: {},
+  backupPrevItem: '',
+  formRules: null,
+  validType: 'text',
+  numberShowMessage: true,
+  startDate: null,
+  startDateTime: null,
+  endDate: null,
+  endDateTime: null,
+  isShowTagKey: true,
+  potentialOptions: null,
+  dateRangeFormat: 'yyyy/MM/dd',
+  datetimeRangeFormat: 'yyyy/MM/dd HH:mm:ss',
+  indexMap: new Map(),
+  valueMap: new Map(),
+  popoverVisible: false,
+  selectValue: '',
+  allTypeAttri: { label: t('tvp.tvpSearchbox.rulekeyword1'), field: 'tvpKeyword', type: 'radio' },
+  operatorValue: ':', // 当前操作符值
+  inputEditValue: '',
+  currentOperators: '',
+  currentEditValue: '',
+  currentModelValueIndex: -1, // 当前编辑的标签索引
+  curMinNumVar: '', // numRange最小值变量
+  curMaxNumVar: '', // numRange最大值变量
+  instance: getCurrentInstance(),
+  isMouseDown: false,
+  currentEditSelectTags: [], // 当前编辑多选的标签值
+  visible: false,
+  visibleTimer: null,
+  hasBackupList: computed(
+    (): boolean => state.propItem.label && [undefined, 'radio', 'checkbox', 'map'].includes(state.prevItem.type)
+  ),
+  isIndeterminate: computed(
+    (): boolean => state.checkboxGroup.length > 0 && state.checkboxGroup.length !== state.filterList.length
+  ),
+  checkAll: computed({
+    get: (): boolean => state.checkboxGroup.length && state.checkboxGroup.length === state.filterList.length,
+    set: (val) => {
+      if (val) {
+        state.checkboxGroup = state.filterList.flatMap((item) => `${state.prevItem.label}${item.label}`)
+      } else {
+        state.checkboxGroup = []
+      }
+    }
+  })
+})
+
+const TinyIconSearch = iconSearch()
+const TinyIconClose = iconClose()
+const TinyIconHelpQuery = iconHelpQuery()
+
+const { selectPropItem, selectRadioItem, selectInputValue, createTag, helpClick, setOperator } = useDropdown({
+  props,
+  emits,
+  state,
+  t,
+  format
+})
+
+const { deleteTag, clearTag, backspaceDeleteTag } = useTag({
+  props,
+  state,
+  emits
+})
+
+const { editTag, confirmEditTag, selectPropChange, selectItemIsDisable } = useEdit({
+  props,
+  state,
+  t,
+  nextTick,
+  format,
+  emits
+})
+
+const { handleInput, selectFirstMap } = useMatch({
+  props,
+  state,
+  emits
+})
+
+const { placeholder, setPlaceholder } = usePlaceholder({ props, state, t })
+
+const { selectCheckbox, isShowClose } = useCheckbox({
+  props,
+  state,
+  emits
+})
+
+const { onConfirmDate, handleDateShow, pickerOptions } = useDatePicker({
+  props,
+  state,
+  emits
+})
+
+const { sizeChange, initFormRule } = useNumRange({
+  props,
+  state,
+  t,
+  emits
+})
+
+const { handleConfirm, handleEditConfirm } = useCustom({ state, emits })
+
+const { initItems, watchOutsideClick, watchMouseDown, watchMouseMove, handleClick } = useInit({
+  props,
+  state
+})
+
+// 处理异步items数据渲染
+watch(
+  () => props.items,
+  (newVal: ISearchBoxItem[]) => {
+    state.recordItems = deepClone(newVal)
+    initItems()
+    initFormRule()
+  },
+  {
+    deep: true,
+    immediate: true
+  }
+)
+
+watch(
+  () => state.popoverVisible,
+  (newVal) => {
+    if (!newVal && !state.inputEditValue.length) {
+      state.inputEditValue = state.currentEditSelectTags
+    }
+  },
+  {
+    immediate: true
+  }
+)
+watch(
+  () => props.modelValue,
+  (newVal) => {
+    if (newVal) {
+      state.indexMap.clear()
+      state.valueMap.clear()
+      newVal.forEach((item, index) => {
+        const value = `${item.label}${item.value}`
+        state.indexMap.set(item.label, index)
+        state.valueMap.set(value, index)
+        if (item.options?.length > 0) {
+          item.options.forEach((option) => {
+            const optionValue = `${item.label}${option.label}`
+            state.valueMap.set(optionValue, index)
+          })
+        }
+      })
+      showPopover(state, false)
+      if (newVal.length === 0) {
+        setPlaceholder(props.emptyPlaceholder)
+      }
+
+      if (props.editable && !state.inputEditValue.length && newVal[0]) {
+        state.inputEditValue = newVal[0].value
+      }
+    }
+    state.innerModelValue = [...newVal]
+  },
+  {
+    deep: true,
+    immediate: true
+  }
+)
+
+onMounted(() => {
+  if (typeof document !== 'undefined') {
+    document.addEventListener('click', watchOutsideClick)
+    document.addEventListener('mousedown', watchMouseDown)
+    document.addEventListener('mousemove', watchMouseMove)
+  }
+})
+
+onBeforeUnmount(() => {
+  if (typeof document !== 'undefined') {
+    document.removeEventListener('click', watchOutsideClick)
+    document.removeEventListener('mousedown', watchMouseDown)
+    document.removeEventListener('mousemove', watchMouseMove)
+  }
+})
+
+const eventsMap = {
+  selectInputValue,
+  selectPropItem,
+  selectRadioItem,
+  setOperator,
+  selectCheckbox,
+  sizeChange,
+  onConfirmDate,
+  selectFirstMap,
+  handleDateShow
+}
+
+const handleEvents = (eventName, p1, p2) => {
+  eventsMap[eventName](p1, p2)
+}
+
+defineExpose({
+  state,
+  handleEvents
+})
+</script>
+
 <template>
-  <div class="tvp-search-box" tiny_mode="pc" @click.stop="showPopover(state, false)">
+  <div class="tvp-search-box" @click.stop="showPopover(state, false)">
     <tiny-icon-search class="tvp-search-box__prefix" />
     <tiny-tag
       v-for="(tag, index) in modelValue"
@@ -15,7 +328,6 @@
     <span v-if="modelValue.length" class="tvp-search-box__placeholder"></span>
 
     <tiny-form
-      v-if="state.instance"
       ref="formRef"
       :model="state"
       :rules="state.formRules"
@@ -33,7 +345,7 @@
         </section>
         <tiny-dropdown
           ref="dropdownRef"
-          :visible.sync="state.visible"
+          v-model:visible="state.visible"
           trigger="click"
           class="tvp-search-box__dropdown"
           :show-icon="false"
@@ -69,19 +381,24 @@
             >
               <div v-show="!state.propItem.label || state.inputValue.trim()">
                 <slot
+                  v-if="state.instance?.slots['first-panel']"
                   name="first-panel"
                   v-bind="{
                     state,
                     handleEvents
                   }"
                   @click.stop
-                >
-                  <TinySearchBoxFirstLevelPanel :state="state" @events="handleEvents"></TinySearchBoxFirstLevelPanel>
-                </slot>
+                ></slot>
+                <TinySearchBoxFirstLevelPanel
+                  v-else
+                  :state="state"
+                  @events="handleEvents"
+                ></TinySearchBoxFirstLevelPanel>
               </div>
               <!-- 有label的情况 -->
               <div v-show="state.propItem.label">
                 <slot
+                  v-if="state.instance?.slots['second-panel']"
                   name="second-panel"
                   v-bind="{
                     state,
@@ -90,9 +407,9 @@
                     back: () => resetInput(state)
                   }"
                   @click.stop
-                >
+                ></slot>
                 <TinySearchBoxSecondLevelPanel
-                    v-if="state.prevItem.type !== 'custom'"
+                  v-else-if="state.prevItem.type !== 'custom'"
                   :state="state"
                   :picker-options="pickerOptions"
                   @events="handleEvents"
@@ -107,7 +424,6 @@
                     @click.stop
                   ></slot>
                 </div>
-                </slot>
               </div>
             </tiny-dropdown-menu>
           </template>
@@ -217,10 +533,9 @@
                 <div class="tvp-search-box__dropdown-title">
                   {{
                     state.prevItem.maxTimeLength > 0
-                      ? t('tvp.tvpSearchbox.timeLengthTitle').replace(
-                          '{value}',
-                          (state.prevItem.maxTimeLength / 86400000).toFixed(1)
-                        )
+                      ? t('tvp.tvpSearchbox.timeLengthTitle', {
+                          value: (state.prevItem.maxTimeLength / 86400000).toFixed(1)
+                        })
                       : t('tvp.tvpSearchbox.rangeDateTitle')
                   }}
                 </div>
@@ -253,10 +568,9 @@
                 <div class="tvp-search-box__dropdown-title">
                   {{
                     state.prevItem.maxTimeLength > 0
-                      ? t('tvp.tvpSearchbox.timeLengthTitle').replace(
-                          '{value}',
-                          (state.prevItem.maxTimeLength / 86400000).toFixed(1)
-                        )
+                      ? t('tvp.tvpSearchbox.timeLengthTitle', {
+                          value: (state.prevItem.maxTimeLength / 86400000).toFixed(1)
+                        })
                       : t('tvp.tvpSearchbox.rangeDateTitle')
                   }}
                 </div>
@@ -314,357 +628,3 @@
     </tiny-form>
   </div>
 </template>
-
-<script>
-// Vue 2 和 Vue 3 兼容版本
-import { onMounted,onBeforeUnmount , getCurrentInstance, defineComponent, reactive, watch, nextTick,  computed, isVue2 } from 'vue-demi'
-// 导入组件
-import TinyTag from '@opentiny/vue-tag'
-import TinyInput from '@opentiny/vue-input'
-import TinyDropdown from '@opentiny/vue-dropdown'
-import TinyDropdownMenu from '@opentiny/vue-dropdown-menu'
-import TinyButton from '@opentiny/vue-button'
-import TinyTooltip from '@opentiny/vue-tooltip'
-import TinyDatePicker from '@opentiny/vue-date-picker'
-import TinyForm from '@opentiny/vue-form'
-import TinyFormItem from '@opentiny/vue-form-item'
-import TinyPopover from '@opentiny/vue-popover'
-import TinySelect from '@opentiny/vue-select'
-import TinyOption from '@opentiny/vue-option'
-
-import { iconSearch, iconClose, iconHelpQuery } from '@opentiny/vue-icon'
-
-// 导入工具函数和类型
-import { format } from './utils/date.ts'
-import { t } from './index.ts'
-import { useTag } from './composables/use-tag'
-import { useDropdown } from './composables/use-dropdown'
-import { useMatch } from './composables/use-match'
-import { useCheckbox } from './composables/use-checkbox'
-import { useDatePicker } from './composables/use-datepicker'
-import { useNumRange } from './composables/use-num-range'
-import { useEdit } from './composables/use-edit'
-import { useCustom } from './composables/use-custom'
-import { useInit } from './composables/use-init'
-import { usePlaceholder } from './composables/use-placeholder'
-// 类型导入 - 兼容 Vue 2 和 Vue 3
-import './index.type'
-import { showDropdown, showPopover } from './utils/dropdown'
-
-import { deepClone } from './utils/clone'
-import { resetInput } from './utils/tag'
-import { useEmitter } from './utils/index'
-import { createSimpleEmitter } from './utils/emitter'
-
-import TinySearchBoxFirstLevelPanel from './components/first-level-panel.vue'
-import TinySearchBoxSecondLevelPanel from './components/second-level-panel.vue'
-import './index.less'
-
-export default defineComponent({
-  name: 'TinySearchBox',
-  components: {
-    TinyTag,
-    TinyInput,
-    TinyDropdown,
-    TinyDropdownMenu,
-    TinyButton,
-    TinyTooltip,
-    TinyDatePicker,
-    TinyForm,
-    TinyFormItem,
-    TinyPopover,
-    TinySelect,
-    TinyOption,
-    TinySearchBoxFirstLevelPanel,
-    TinySearchBoxSecondLevelPanel,
-    // 图标组件
-    TinyIconSearch: iconSearch(),
-    TinyIconClose: iconClose(),
-    TinyIconHelpQuery: iconHelpQuery()
-  },
-
-  props: {
-    modelValue: {
-      type: Array,
-      default: () => []
-    },
-    items: {
-      type: Array,
-      default: () => []
-    },
-    emptyPlaceholder: {
-      type: String,
-      default: ''
-    },
-    potentialOptions: {
-      type: Object,
-      default: () => null
-    },
-    showHelp: {
-      type: Boolean,
-      default: true
-    },
-    idMapKey: {
-      type: String,
-      default: 'id'
-    },
-    defaultField: {
-      type: String,
-      default: ''
-    },
-    editable: {
-      type: Boolean,
-      default: false
-    },
-    maxlength: {
-      type: Number,
-      default: undefined
-    },
-    panelMaxHeight: {
-      type: String,
-      default: '999px'
-    },
-    splitInputValue: {
-      type: String,
-      default: ','
-    }
-  },
-
-  emits: ['update:modelValue', 'change', 'search', 'exceed', 'first-level-select', 'clear'],
-  setup(props, { emit }) {
-    const instance = getCurrentInstance()
-    // 兼容 Vue2：给第三方组件（如 @opentiny/vue-form）提供 $emitter
-    // 保持两套职责：
-    // - `useEmitter()` 提供覆盖 $emit 的函数（组合式 emit）
-    // - `$emitter` 提供事件总线对象（on/off/emit），供第三方组件使用
-    const customEmit = useEmitter()
-
-    if (isVue2 && instance) {
-      const proxy = instance.proxy || instance
-      if (proxy) {
-        // 确保 root 上存在事件总线，优先复用（与 tiny-vue 对齐）
-        if (proxy.$root && !proxy.$root.$emitter) proxy.$root.$emitter = createSimpleEmitter()
-        // 将 $emitter 指向 root 上的事件总线或当前实例已有的
-        if (!proxy.$emitter) proxy.$emitter = (proxy.$root && proxy.$root.$emitter) || createSimpleEmitter()
-        // 覆盖 $emit 为组合式 emit 的适配函数，保证第三方依赖调用 this.$emit 时能被捕获
-        proxy.$emit = customEmit
-      }
-    }
-
-    console.info('TinyDropdownTinyDropdownTinyDropdownTinyDropdown', instance)
-
-    // 响应式状态
-    const state = reactive({
-      emit,
-      innerModelValue: [...props.modelValue],
-      recordItems: [],
-      groupItems: {},
-      inputValue: '',
-      matchItems: {},
-      propItem: {},
-      backupList: [],
-      filterList: [],
-      checkboxGroup: [],
-      prevItem: {},
-      backupPrevItem: '',
-      formRules: null,
-      validType: 'text',
-      numberShowMessage: true,
-      startDate: null,
-      startDateTime: null,
-      endDate: null,
-      endDateTime: null,
-      isShowTagKey: true,
-      potentialOptions: null,
-      dateRangeFormat: 'yyyy/MM/dd',
-      datetimeRangeFormat: 'yyyy/MM/dd HH:mm:ss',
-      indexMap: new Map(),
-      valueMap: new Map(),
-      popoverVisible: false,
-      selectValue: '',
-      allTypeAttri: { label: t('tvp.tvpSearchbox.rulekeyword1'), field: 'tvpKeyword', type: 'radio' },
-      operatorValue: ':',
-      inputEditValue: '',
-      currentOperators: '',
-      currentEditValue: '',
-      currentModelValueIndex: -1,
-      curMinNumVar: '',
-      curMaxNumVar: '',
-      instance: isVue2 ? instance?.proxy : instance,
-      isMouseDown: false,
-      currentEditSelectTags: [],
-      visible: false,
-      visibleTimer: null,
-      hasBackupList: computed(
-        () => state.propItem.label && [undefined, 'radio', 'checkbox', 'map'].includes(state.prevItem.type)
-      ),
-      isIndeterminate: computed(
-        () => state.checkboxGroup.length > 0 && state.checkboxGroup.length !== state.filterList.length
-      ),
-      checkAll: computed({
-        get: () => state.checkboxGroup.length && state.checkboxGroup.length === state.filterList.length,
-        set: (val) => {
-          if (val) {
-            state.checkboxGroup = state.filterList.flatMap((item) => `${state.prevItem.label}${item.label}`)
-          } else {
-            state.checkboxGroup = []
-          }
-        }
-      })
-    })
-
-    console.info('*************instnce', state.instance)
-
-    // 使用组合式函数
-    // 统一组合式函数参数为 emit
-    const dropdownApi = useDropdown({ props, emit, state, t, format })
-    const tagApi = useTag({ props, state, emit })
-    const editApi = useEdit({ props, state, t, nextTick, format, emit })
-    const matchApi = useMatch({ props, state, emit })
-    const placeholderApi = usePlaceholder({ props, state, t })
-    const checkboxApi = useCheckbox({ props, state, emit })
-    const datePickerApi = useDatePicker({ props, state, emit })
-    const numRangeApi = useNumRange({ props, state, t, emit })
-    const customApi = useCustom({ state, emit })
-    const initApi = useInit({ props, state })
-
-    // 解构所有事件方法
-    const { selectPropItem, selectRadioItem, selectInputValue, createTag, helpClick, setOperator } = dropdownApi
-    const { deleteTag, clearTag, backspaceDeleteTag } = tagApi
-    const { editTag, confirmEditTag, selectPropChange, selectItemIsDisable } = editApi
-    const { handleInput, selectFirstMap } = matchApi
-    const { placeholder, setPlaceholder } = placeholderApi
-    const { selectCheckbox, isShowClose } = checkboxApi
-    const { onConfirmDate, handleDateShow, pickerOptions } = datePickerApi
-    const { sizeChange, initFormRule } = numRangeApi
-    const { handleConfirm, handleEditConfirm } = customApi
-    const { initItems, watchOutsideClick, watchMouseDown, watchMouseMove, handleClick } = initApi
-
-    // 事件映射
-    // 事件映射，始终闭包引用最新api
-    const eventsMap = () => ({
-      selectInputValue,
-      selectPropItem,
-      selectRadioItem,
-      setOperator,
-      selectCheckbox,
-      sizeChange,
-      onConfirmDate,
-      selectFirstMap,
-      handleDateShow
-    })
-
-    const handleEvents = (eventName, p1, p2) => {
-      const map = eventsMap()
-      if (typeof map[eventName] === 'function') {
-        map[eventName](p1, p2)
-      } else {
-        console.warn(`[TinySearchBox] Unknown event: ${eventName}`)
-      }
-    }
-
-    // 监听器
-    watch(
-      () => props.items,
-      (newVal) => {
-        state.recordItems = deepClone(newVal)
-        initItems()
-        initFormRule()
-      },
-      {
-        deep: true,
-        immediate: true
-      }
-    )
-
-    watch(
-      () => state.popoverVisible,
-      (newVal) => {
-        if (!newVal && !state.inputEditValue.length) {
-          state.inputEditValue = state.currentEditSelectTags
-        }
-      },
-      {
-        immediate: true
-      }
-    )
-
-    watch(
-      () => props.modelValue,
-      (newVal) => {
-        if (newVal) {
-          state.indexMap.clear()
-          state.valueMap.clear()
-          newVal.forEach((item, index) => {
-            const value = `${item.label}${item.value}`
-            state.indexMap.set(item.label, index)
-            state.valueMap.set(value, index)
-            if (item.options?.length > 0) {
-              item.options.forEach((option) => {
-                const optionValue = `${item.label}${option.label}`
-                state.valueMap.set(optionValue, index)
-              })
-            }
-          })
-          showPopover(state, false)
-          if (newVal.length === 0) {
-            setPlaceholder(props.emptyPlaceholder)
-          }
-
-          if (props.editable && !state.inputEditValue.length && newVal[0]) {
-            state.inputEditValue = newVal[0].value
-          }
-          state.innerModelValue = [...newVal]
-        }
-      },
-      {
-        deep: true,
-        immediate: true
-      }
-    )
-
-    // 生命周期
-    onMounted(() => {
-      if (typeof document !== 'undefined') {
-        document.addEventListener('click', watchOutsideClick)
-        document.addEventListener('mousedown', watchMouseDown)
-        document.addEventListener('mousemove', watchMouseMove)
-      }
-    })
-
-    onBeforeUnmount(() => {
-      if (typeof document !== 'undefined') {
-        document.removeEventListener('click', watchOutsideClick)
-        document.removeEventListener('mousedown', watchMouseDown)
-        document.removeEventListener('mousemove', watchMouseMove)
-      }
-    })
-
-    // 暴露给模板的方法
-    return {
-      t,
-      state,
-      placeholder,
-      isShowClose,
-      deleteTag,
-      editTag,
-      backspaceDeleteTag,
-      createTag,
-      clearTag,
-      helpClick,
-      handleInput,
-      handleClick,
-      handleEvents,
-      pickerOptions,
-      resetInput,
-      selectItemIsDisable,
-      selectPropChange,
-      confirmEditTag,
-      handleConfirm,
-      handleEditConfirm,
-      showDropdown,
-      showPopover
-    }
-  }
-})
-</script>

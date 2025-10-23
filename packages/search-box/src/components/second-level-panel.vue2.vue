@@ -102,15 +102,15 @@
         </tiny-button>
       </div>
     </div>
-
     <div v-else-if="state.prevItem.type === 'dateRange'" class="tvp-search-box__panel-box">
       <div class="tvp-search-box__date-wrap">
         <div class="tvp-search-box__dropdown-title">
           {{
             state.prevItem.maxTimeLength > 0
-              ? t('tvp.tvpSearchbox.timeLengthTitle', {
-                  value: (state.prevItem.maxTimeLength / 86400000).toFixed(1)
-                })
+              ? t('tvp.tvpSearchbox.timeLengthTitle').replace(
+                  '{value}',
+                  (state.prevItem.maxTimeLength / 86400000).toFixed(1)
+                )
               : t('tvp.tvpSearchbox.rangeDateTitle')
           }}
         </div>
@@ -126,8 +126,7 @@
             :value-format="state.prevItem.format || state.dateRangeFormat"
             :picker-options="pickerOptions(state.startDate, 'endDate')"
             class="tvp-search-box__date-picker"
-            @change="handleDateShow"
-            @blur="handleDateShow"
+            @visible-change="handleDateShow"
           ></tiny-date-picker>
         </tiny-form-item>
         <div class="tvp-search-box__dropdown-end">{{ t('tvp.tvpSearchbox.rangeEndLabel') }}</div>
@@ -138,60 +137,7 @@
             :value-format="state.prevItem.format || state.dateRangeFormat"
             :picker-options="pickerOptions(state.startDate)"
             class="tvp-search-box__date-picker"
-            @change="handleDateShow"
-            @blur="handleDateShow"
-          ></tiny-date-picker>
-        </tiny-form-item>
-      </div>
-      <div class="tvp-search-box__bottom-btn">
-        <tiny-button size="mini" @click="onConfirmDate(false)">
-          {{ t('tvp.tvpSearchbox.cancel') }}
-        </tiny-button>
-        <tiny-button size="mini" @click="onConfirmDate(true)">
-          {{ t('tvp.tvpSearchbox.confirm') }}
-        </tiny-button>
-      </div>
-    </div>
-
-    <div v-else-if="state.prevItem.type === 'datetimeRange'" class="tvp-search-box__panel-box">
-      <div class="tvp-search-box__date-wrap">
-        <div class="tvp-search-box__dropdown-title">
-          {{
-            state.prevItem.maxTimeLength > 0
-              ? t('tvp.tvpSearchbox.timeLengthTitle').replace('{value}', (state.prevItem.maxTimeLength / 86400000).toFixed(1))
-              : t('tvp.tvpSearchbox.rangeDateTitle')
-          }}
-        </div>
-        <div class="tvp-search-box__dropdown-start">{{ t('tvp.tvpSearchbox.rangeBeginLabel') }}</div>
-        <tiny-form-item
-          prop="startDateTime"
-          :show-message="Boolean(state.prevItem.maxTimeLength)"
-          class="tvp-search-box__date-item"
-        >
-          <tiny-date-picker
-            v-model="state.startDateTime"
-            type="datetime"
-            :isutc8="true"
-            :format="state.prevItem.format || state.datetimeRangeFormat"
-            :value-format="state.prevItem.format || state.datetimeRangeFormat"
-            :picker-options="pickerOptions(state.startDateTime, 'endDateTime')"
-            class="tvp-search-box__date-picker"
-            @change="handleDateShow"
-            @blur="handleDateShow"
-          ></tiny-date-picker>
-        </tiny-form-item>
-        <div class="tvp-search-box__dropdown-end">{{ t('tvp.tvpSearchbox.rangeEndLabel') }}</div>
-        <tiny-form-item prop="endDateTime" class="tvp-search-box__date-item">
-          <tiny-date-picker
-            v-model="state.endDateTime"
-            type="datetime"
-            :isutc8="true"
-            :format="state.prevItem.format || state.datetimeRangeFormat"
-            :value-format="state.prevItem.format || state.datetimeRangeFormat"
-            :picker-options="pickerOptions(state.startDateTime)"
-            class="tvp-search-box__date-picker"
-            @change="handleDateShow"
-            @blur="handleDateShow"
+            @visible-change="handleDateShow"
           ></tiny-date-picker>
         </tiny-form-item>
       </div>
@@ -222,9 +168,9 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent, computed, getCurrentInstance, isVue2 } from 'vue-demi'
-
+<script>
+// Vue2 版本，使用 tiny-vue 的 renderless 架构
+import { defineComponent, setup, $props, $prefix } from '@opentiny/vue-common'
 import TinyFormItem from '@opentiny/vue-form-item'
 import TinyDropdownItem from '@opentiny/vue-dropdown-item'
 import TinyCheckbox from '@opentiny/vue-checkbox'
@@ -233,14 +179,71 @@ import TinyDatePicker from '@opentiny/vue-date-picker'
 import TinyInput from '@opentiny/vue-input'
 import TinyButton from '@opentiny/vue-button'
 import TinyLoading from '@opentiny/vue-loading'
-import { t } from '../index'
-import { useEmitter } from '../utils/index'
-import { createSimpleEmitter } from '../utils/emitter'
-
+import { t } from '../utils/i18n'
 import '../index.less'
 
+// 简单的 renderless 函数
+const renderless = (props, hooks, { emit }) => {
+  const { computed } = hooks
+
+  const events = (eventName, p1, p2) => {
+    emit('events', eventName, p1, p2)
+  }
+
+  const setOperator = (e) => {
+    events('setOperator', e)
+  }
+
+  const selectRadioItem = (e) => {
+    events('selectRadioItem', e)
+  }
+
+  const selectCheckbox = (e) => {
+    events('selectCheckbox', e)
+  }
+
+  const sizeChange = (e) => {
+    events('sizeChange', e)
+  }
+
+  const onConfirmDate = (e, b) => {
+    events('onConfirmDate', e, b)
+  }
+
+  const selectFirstMap = (e, b) => {
+    events('selectFirstMap', e, b)
+  }
+
+  const handleDateShow = (e) => {
+    events('handleDateShow', e)
+  }
+
+  const isLoading = computed(() => {
+    return props.state.hasBackupList && props.state.backupList?.length === 0
+  })
+
+  const showCheckBoxList = computed(() => {
+    return props.state.backupList?.find((item) => !item.isFilter)
+  })
+
+  return {
+    setOperator,
+    selectRadioItem,
+    selectCheckbox,
+    sizeChange,
+    onConfirmDate,
+    selectFirstMap,
+    handleDateShow,
+    isLoading,
+    showCheckBoxList,
+    t
+  }
+}
+
+const api = ['setOperator', 'selectRadioItem', 'selectCheckbox', 'sizeChange', 'onConfirmDate', 'selectFirstMap', 'handleDateShow', 'isLoading', 'showCheckBoxList', 't']
+
 export default defineComponent({
-  name: 'TinySearchBoxSecondLevelPanel',
+  name: $prefix + 'SearchBoxSecondLevelPanel',
   components: {
     TinyFormItem,
     TinyDropdownItem,
@@ -254,6 +257,7 @@ export default defineComponent({
     loading: TinyLoading.directive
   },
   props: {
+    ...$props,
     state: {
       type: Object,
       default: () => ({})
@@ -265,67 +269,10 @@ export default defineComponent({
       }
     }
   },
-  emits: ['events'],
-
-   setup(props) {
-    const emit = useEmitter()
-    const instance = getCurrentInstance()
-
-    const isLoading = computed (() => {
-      return props.state.hasBackupList && props.state.backupList?.length === 0
-    })
-    // 多选未匹配到选项情况下，不显示全选以及确认按钮
-    const showCheckBoxList = computed(() => {
-      return props.state.backupList?.find((item: any) => !item.isFilter)
-    }) 
-    
-    // 在 Vue 2 中设置 emit，但添加额外的保护措施
-    if (isVue2 && instance && instance.proxy) {
-      if (!instance.proxy.$emitter) {
-        instance.proxy.$emitter = (instance.proxy.$root && instance.proxy.$root.$emitter) || createSimpleEmitter()
-      }
-      instance.proxy.$emit = emit
-    }
-    
-    const events = (eventName: string, p1?: any, p2?: any) => {
-      emit('events', eventName, p1, p2)
-    }
-    const setOperator = (e: any) => {
-      events('setOperator', e)
-    }
-    const selectRadioItem = (e: any) => {
-      events('selectRadioItem', e)
-    }
-    const selectCheckbox = (e: any) => {
-      events('selectCheckbox', e)
-    }
-    const sizeChange = (e: any) => {
-      events('sizeChange', e)
-    }
-    const onConfirmDate = (e: any, b?: any) => {
-      events('onConfirmDate', e, b)
-    }
-    const selectFirstMap = (e: any, b: any) => {
-      events('selectFirstMap', e, b)
-    }
-    const handleDateShow = (e: any) => {
-      events('handleDateShow', e)
-    }
-
-     // 暴露给模板的方法
-    return {
-      t,
-      isLoading,
-      showCheckBoxList,
-      events,
-      setOperator,
-      selectCheckbox,
-      sizeChange,
-      onConfirmDate,
-      selectFirstMap,
-      handleDateShow,
-      selectRadioItem
-    }
+  setup(props, context) {
+    return setup({ props, context, renderless, api })
   }
 })
 </script>
+
+

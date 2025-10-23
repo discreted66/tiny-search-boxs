@@ -22,7 +22,7 @@ export function rollupExternalFromPackage(pkgPath: string) {
     return Array.from(packages).some((pkg) => id === pkg || id.startsWith(`${pkg}/`))
   }
 }
-console.log('99999999999999999999999999',rollupExternalFromPackage(resolve(__dirname, 'package.json')))
+console.log('99999999999999999999999999', rollupExternalFromPackage(resolve(__dirname, 'package.json')))
 
 function rollupOutput(target: string, format: string): any {
   return {

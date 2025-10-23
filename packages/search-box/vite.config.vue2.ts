@@ -3,10 +3,11 @@ import { defineConfig } from 'vite'
 import { readFileSync } from 'node:fs'
 import * as glob from 'glob'
 import vue from '@vitejs/plugin-vue2'
+import { virtualTemplatePlugin } from './plugins/virtual-template'
 // import vue from 'vite-plugin-vue2'
 
 
-const input = glob.sync('./src/**/*.ts', {
+const input = glob.sync('./src/index.vue2.ts', {
   cwd: __dirname,
   absolute: true
 })
@@ -39,11 +40,10 @@ function rollupOutput(target: string, format: string): any {
   }
 }
 export default defineConfig({
-  plugins: [vue()],
+  plugins: [vue(), virtualTemplatePlugin()],
   resolve: {
     alias: {
       // 确保指向正确的 Vue 模块
-      'vue': 'vue2',
       '@opentiny/vue-button': '@opentiny/vue-button2',
       '@opentiny/vue-checkbox': '@opentiny/vue-checkbox2',
       '@opentiny/vue-checkbox-group': '@opentiny/vue-checkbox-group2',
@@ -73,7 +73,9 @@ export default defineConfig({
       input,
       treeshake: false,
       preserveEntrySignatures: 'allow-extension',
-      external: ['vue', 'vue-demi', '@opentiny/*'],
+      // external: ['vue', 'vue-demi', '@opentiny/*'],
+      external: rollupExternalFromPackage(resolve(__dirname, 'package.json')),
+
       output: [rollupOutput('es', 'es'), rollupOutput('cjs', 'lib')]
     }
   }

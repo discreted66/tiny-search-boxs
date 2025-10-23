@@ -84,22 +84,48 @@
   </div>
 </template>
 
-<script lang="ts">
-// import { defineComponent, getCurrentInstance } from 'vue'
-import { defineComponent, getCurrentInstance, isVue2} from 'vue-demi'
+<script>
+// Vue2 版本，使用 tiny-vue 的 renderless 架构
+import { defineComponent, setup, $props, $prefix } from '@opentiny/vue-common'
 import TinyDropdownItem from '@opentiny/vue-dropdown-item'
-import { useEmitter } from '../utils/index'
-import { createSimpleEmitter } from '../utils/emitter'
-
-import { t } from '../index'
+import { t } from '../utils/i18n'
 import '../index.less'
 
+// 简单的 renderless 函数
+const renderless = (props, hooks, { emit }) => {
+  const events = (eventName, p1, p2) => {
+    emit('events', eventName, p1, p2)
+  }
+
+  const selectInputValue = (e) => {
+    events('selectInputValue', e)
+  }
+
+  const selectPropItem = (e) => {
+    events('selectPropItem', e)
+  }
+
+  const selectRadioItem = (e, v) => {
+    events('selectRadioItem', e, v)
+  }
+
+  return {
+    selectInputValue,
+    selectPropItem,
+    selectRadioItem,
+    t
+  }
+}
+
+const api = ['selectInputValue', 'selectPropItem', 'selectRadioItem', 't']
+
 export default defineComponent({
-  name: 'TinySearchBoxFirstLevelPanel',
+  name: $prefix + 'SearchBoxFirstLevelPanel',
   components: {
     TinyDropdownItem
   },
   props: {
+    ...$props,
     state: {
       type: Object,
       default: () => ({})
@@ -109,42 +135,10 @@ export default defineComponent({
       default: () => []
     }
   },
-  emits: ['events', 'selectInputValue', 'selectPropItem', 'selectRadioItem'],
-  setup() {
-    const emit = useEmitter()
-    const instance = getCurrentInstance()
-    
-    // 在 Vue 2 中设置 emit，但添加额外的保护措施
-    if (isVue2 && instance && instance.proxy) {
-      // 确保 $emitter 属性存在，避免第三方组件库访问时出错
-      if (!instance.proxy.$emitter) {
-        instance.proxy.$emitter = (instance.proxy.$root && instance.proxy.$root.$emitter) || createSimpleEmitter()
-      }
-      // 保持组合式 emit 的功能（覆盖 $emit），同时不破坏 $emitter 对象
-      instance.proxy.$emit = emit
-    }
-    
-    const events = (eventName: string, p1?: any, p2?: any) => {
-      emit('events', eventName, p1, p2)
-    }
-    const selectInputValue = (e: any) => {
-      events('selectInputValue', e)
-    }
-    const selectPropItem = (e: any) => {
-      events('selectPropItem', e)
-    }
-    const selectRadioItem = (e: any, v: any) => {
-      events('selectRadioItem', e, v)
-    }
-
-     // 暴露给模板的方法
-    return {
-      t,
-      events,
-      selectInputValue,
-      selectPropItem,
-      selectRadioItem
-    }
+  setup(props, context) {
+    return setup({ props, context, renderless, api })
   }
 })
 </script>
+
+
