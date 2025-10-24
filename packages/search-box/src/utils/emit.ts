@@ -1,4 +1,4 @@
-import { getCurrentInstance } from 'vue-demi'
+import { getCurrentInstance } from 'vue'
 
 /**
  * 获取当前实例的事件发射器
@@ -6,7 +6,7 @@ import { getCurrentInstance } from 'vue-demi'
  */
 export const useEmitter = () => {
   const instance = getCurrentInstance()
-  
+
   if (!instance) {
     throw new Error('useEmitter must be called within a component setup function')
   }

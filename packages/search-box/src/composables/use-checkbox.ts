@@ -1,4 +1,4 @@
-import { computed } from 'vue-demi'
+import { computed } from 'vue'
 import { hasTagItem, createNewTag, getTagId, emitChangeModelEvent } from '../utils/tag'
 import { deepClone, omitObj } from '../utils/clone'
 import { showDropdown } from '../utils/dropdown'
@@ -65,10 +65,9 @@ export function useCheckbox({ props, state, emit }) {
     }
   }
 
-  const isShowClose = computed(() => props.modelValue.length || state.propItem.label || state.inputValue)
 
   return {
     selectCheckbox,
-    isShowClose
+
   }
 }

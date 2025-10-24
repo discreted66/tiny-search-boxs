@@ -84,7 +84,7 @@ const initState = ({ reactive, computed, api, i18n, watch, props, emit, vm }) =>
     currentModelValueIndex: -1,
     curMinNumVar: '',
     curMaxNumVar: '',
-    instance: vm.proxy,
+    instance: vm,
     isMouseDown: false,
     currentEditSelectTags: [],
     visible: false,
@@ -113,9 +113,11 @@ export const renderless = (
   const api = {} as any
   const emit = props.emitter ? props.emitter.emit : $emit
   const state = initState({ reactive, computed, api, i18n, watch, props, emit, vm })
+  initAllApi({ api, state, t, props, emit, nextTick, vm, computed })
+  console.info('api', api)
   initWatch({ watch, state, props, api, nextTick })
-  initAllApi({ api, state, t, props, emit, nextTick, vm, watch })
   console.info('getCurrentInstance', getCurrentInstance(), 'api', api)
+
   // 生命周期
   onMounted(() => {
     if (typeof document !== 'undefined') {
@@ -140,17 +142,21 @@ export const renderless = (
 }
 
 
-const initAllApi = ({ api, state, t, props, emit, nextTick, vm, watch }) => {
+const initAllApi = ({ api, state, t, props, emit, nextTick, vm, computed }) => {
+
+  console.info('vm', vm)
   const { selectPropItem, selectRadioItem, selectInputValue, createTag, helpClick, setOperator } = useDropdown({ props, emit, state, t, format })
   const { deleteTag, clearTag, backspaceDeleteTag } = useTag({ props, state, emit })
   const { editTag, confirmEditTag, selectPropChange, selectItemIsDisable } = useEdit({ props, state, t, nextTick, format, emit })
   const { handleInput, selectFirstMap } = useMatch({ props, state, emit })
-  const { placeholder, setPlaceholder } = usePlaceholder({ props, state, t })
-  const { selectCheckbox, isShowClose } = useCheckbox({ props, state, emit })
+  const { placeholder, setPlaceholder } = usePlaceholder({ props, state, t, vm })
+  const { selectCheckbox } = useCheckbox({ props, state, emit })
   const { onConfirmDate, handleDateShow, pickerOptions } = useDatePicker({ props, state, emit })
   const { sizeChange, initFormRule } = useNumRange({ props, state, t, emit })
   const { handleConfirm, handleEditConfirm } = useCustom({ state, emit })
   const { initItems, watchOutsideClick, watchMouseDown, watchMouseMove, handleClick } = useInit({ props, state })
+
+  const isShowClose = computed(() => props.modelValue.length || state.propItem.label || state.inputValue)
 
   const eventsMap = () => ({
     selectInputValue,

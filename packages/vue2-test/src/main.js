@@ -25,13 +25,13 @@ Vue.mixin({
 
 import './assets/main.css'
 
-// 使用构建产物而不是源码路径
-// import TinySearchBox from '@discreted/vue-search-box/dist/vue2/es/index.es.js'
+// 导入Vue2版本的TinySearchBox组件
+import TinySearchBox from '../../search-box/vue2/src/index.vue'
 
-// console.info('Vue2 test loaded:', TinySearchBox)
+console.info('Vue2 test loaded:', TinySearchBox)
 
-// // 注册组件
-// Vue.component('TinySearchBox', TinySearchBox)
+// 注册组件
+Vue.component('TinySearchBox', TinySearchBox)
 
 const app = new Vue({
   router,

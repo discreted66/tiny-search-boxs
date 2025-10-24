@@ -1,4 +1,4 @@
-import { ref } from 'vue-demi'
+import { ref } from 'vue'
 import Loading from '@opentiny/vue-loading'
 import { debounce } from '../utils/index'
 import { hasTagItem, createNewTag, getTagId, emitChangeModelEvent } from '../utils/tag'

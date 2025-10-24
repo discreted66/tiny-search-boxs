@@ -62,7 +62,7 @@ export function useDropdown({ props, emit, state, t, format }) {
 
     emit('first-level-select', field)
 
-    const inputRef = instance.refs.inputRef
+    const inputRef = instance.$refs?.inputRef
     state.prevItem = item
     state.backupPrevItem = item
     const { operators } = item
@@ -154,7 +154,7 @@ export function useDropdown({ props, emit, state, t, format }) {
 
     const { prevItem } = state
     const value = item.value || item.label
-    const inputRef = instance.refs.inputRef
+    const inputRef = instance.$refs?.inputRef
     if (!hasTagItem(state, value)) {
       const tagLabel = state.propItem.label || item.label
       updateModelValue(prevItem, item, tagLabel, value)

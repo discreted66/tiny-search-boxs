@@ -1,7 +1,6 @@
 <script setup>
-import { ref } from 'vue';
-import HelloWorld from './components/HelloWorld.vue';
-import { dataSource } from './data-source';
+import { ref } from "vue";
+import { dataSource } from "./data-source";
 
 const tags = ref([]);
 </script>
