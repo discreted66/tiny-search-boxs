@@ -1,7 +1,7 @@
 import { createApp } from 'vue'
 import './style.css'
 import App from './App.vue'
-import TinySearchBox from '../../search-box/src/index.ts'
+import TinySearchBox from '@opentiny/vue-search-box'
 // import TinySearchBox from '../../search-box/dist/vue3/es/index.vue3.es.js'
 // import { install, isVue2, isVue3 } from 'vue-demi';
 // install(); // 强制启用 Vue 2 模式
