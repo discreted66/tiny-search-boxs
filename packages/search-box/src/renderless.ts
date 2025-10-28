@@ -133,6 +133,8 @@ export const renderless = (
     }
   })
 
+  console.log('===========api:', api);
+
   // 暴露给模板的方法
   return api
 }

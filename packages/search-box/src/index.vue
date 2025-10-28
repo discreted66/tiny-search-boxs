@@ -8,7 +8,7 @@
       tiny_mode="pc"
     ></tiny-input>
     {{ state.inputValue }}
-    <!-- <tiny-tag
+    <tiny-tag
   
       v-for="(tag, index) in modelValue"
       :key="tag.field + index"
@@ -23,9 +23,9 @@
         >{{ tag.label }} {{ tag.operator || ":" }} {{ tag.value }}
       </span>
     </tiny-tag>
-    <span v-if="modelValue.length" class="tvp-search-box__placeholder"></span> -->
+    <span v-if="modelValue.length" class="tvp-search-box__placeholder"></span>
 
-    <!-- <tiny-form
+    <tiny-form
       ref="formRef"
       :model="state"
       :rules="state.formRules"
@@ -387,7 +387,12 @@
           </div>
         </tiny-popover>
       </template>
-    </tiny-form> -->
+    </tiny-form>
+    <div>{{ state.groupItems['0'].map(item => item.label).join(', ') }}</div>
+    <div>
+      <tiny-input v-model="state.inputValue" placeholder="Please input"></tiny-input>
+      <tiny-button type="primary">提交</tiny-button>
+    </div>
   </div>
 </template>
 
@@ -419,25 +424,25 @@ import "./index.less";
 export default defineComponent({
   name: "TinySearchBox",
   components: {
-    // TinyTag,
+    TinyTag,
     TinyInput,
-    // TinyDropdown,
-    // TinyDropdownMenu,
-    // TinyButton,
-    // TinyButtonGroup,
-    // TinyTooltip,
-    // TinyDatePicker,
-    // TinyForm,
-    // TinyFormItem,
-    // TinyPopover,
-    // TinySelect,
-    // TinyOption,
-    // TinySearchBoxFirstLevelPanel,
-    // TinySearchBoxSecondLevelPanel,
-    // // 图标组件
-    // TinyIconSearch: iconSearch(),
-    // TinyIconClose: iconClose(),
-    // TinyIconHelpQuery: iconHelpQuery(),
+    TinyDropdown,
+    TinyDropdownMenu,
+    TinyButton,
+    TinyButtonGroup,
+    TinyTooltip,
+    TinyDatePicker,
+    TinyForm,
+    TinyFormItem,
+    TinyPopover,
+    TinySelect,
+    TinyOption,
+    TinySearchBoxFirstLevelPanel,
+    TinySearchBoxSecondLevelPanel,
+    // 图标组件
+    TinyIconSearch: iconSearch(),
+    TinyIconClose: iconClose(),
+    TinyIconHelpQuery: iconHelpQuery(),
   },
   props: {
     ...$props,

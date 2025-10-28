@@ -64,6 +64,26 @@ export default defineConfig((config) => {
     resolve: {
       extensions: ['.js', '.ts', '.tsx', '.vue'],
       alias: {
+        'vue': path.resolve('node_modules/vue/dist/vue.esm.js'),
+        "@opentiny/vue-button": path.resolve('../search-box/node_modules/@opentiny/vue-button'),
+        "@opentiny/vue-button-group": path.resolve('../search-box/node_modules/@opentiny/vue-button-group'),
+        "@opentiny/vue-checkbox": path.resolve('../search-box/node_modules/@opentiny/vue-checkbox'),
+        "@opentiny/vue-checkbox-group": path.resolve('../search-box/node_modules/@opentiny/vue-checkbox-group'),
+        "@opentiny/vue-date-picker": path.resolve('../search-box/node_modules/@opentiny/vue-date-picker'),
+        "@opentiny/vue-dropdown": path.resolve('../search-box/node_modules/@opentiny/vue-dropdown'),
+        "@opentiny/vue-dropdown-item": path.resolve('../search-box/node_modules/@opentiny/vue-dropdown-item'),
+        "@opentiny/vue-dropdown-menu": path.resolve('../search-box/node_modules/@opentiny/vue-dropdown-menu'),
+        "@opentiny/vue-form": path.resolve('../search-box/node_modules/@opentiny/vue-form'),
+        "@opentiny/vue-form-item": path.resolve('../search-box/node_modules/@opentiny/vue-form-item'),
+        "@opentiny/vue-icon": path.resolve('../search-box/node_modules/@opentiny/vue-icon'),
+        "@opentiny/vue-input": path.resolve('../search-box/node_modules/@opentiny/vue-input'),
+        "@opentiny/vue-loading": path.resolve('../search-box/node_modules/@opentiny/vue-loading'),
+        "@opentiny/vue-option": path.resolve('../search-box/node_modules/@opentiny/vue-option'),
+        "@opentiny/vue-popover": path.resolve('../search-box/node_modules/@opentiny/vue-popover'),
+        "@opentiny/vue-select": path.resolve('../search-box/node_modules/@opentiny/vue-select'),
+        "@opentiny/vue-tag": path.resolve('../search-box/node_modules/@opentiny/vue-tag'),
+        "@opentiny/vue-tooltip": path.resolve('../search-box/node_modules/@opentiny/vue-tooltip'),
+        "@opentiny/vue-common": path.resolve('../search-box/node_modules/@opentiny/vue-common'),
       }
     },
     // define: {
