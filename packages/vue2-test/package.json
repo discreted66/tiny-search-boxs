@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "@opentiny/vue-icon": "2.26.0",
+    "@opentiny/vue-search-box": "workspace:~",
     "vue": "2.6.14",
     "less": "4.3.0"
   },
