@@ -12,7 +12,7 @@
     "@opentiny/vue-button": "^3.22.0",
     "@opentiny/vue-input": "^3.22.0",
     "@opentiny/vue-common": "^3.26.0",
-    "@discreted/vue-search-box": "workspace:^",
+    "@opentiny/vue-search-box": "workspace:^",
     "@opentiny/vue-theme": "^3.22.0",
     "@opentiny/vue-theme-saas": "latest",
     "@opentiny/vue-icon-saas": "latest",

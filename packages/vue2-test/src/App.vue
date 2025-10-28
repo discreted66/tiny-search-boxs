@@ -1,7 +1,7 @@
 <script>
 import { dataSource } from "./data-source.js";
 import { iconSearch } from "@opentiny/vue-icon";
-import TinySearchBox from "../../search-box/src/index.ts";
+import TinySearchBox from "@opentiny/vue-search-box";
 // console.info(TinySearchBox)
 // const
 
