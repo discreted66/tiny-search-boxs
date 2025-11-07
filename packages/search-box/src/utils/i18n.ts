@@ -29,15 +29,16 @@ export const setGlobalApp = (app: any) => {
  * @returns {string} 当前语言代码
  */
 export const getCurrentLocale = () => {
+  // Vue3: 从 config.globalProperties 获取
   if (globalApp?.config?.globalProperties?.$i18n?.locale) {
     return globalApp.config.globalProperties.$i18n.locale
   }
-  
-  // 尝试从Vue实例获取
+
+  // Vue2: 从 $i18n 获取（当传入的是包含 $i18n 的对象时）
   if (globalApp?.$i18n?.locale) {
     return globalApp.$i18n.locale
   }
-  
+
   // 尝试从浏览器语言获取
   if (typeof navigator !== 'undefined') {
     const browserLang = navigator.language || navigator.languages?.[0]
@@ -45,7 +46,7 @@ export const getCurrentLocale = () => {
       return browserLang.startsWith('zh') ? 'zh-CN' : 'en-US'
     }
   }
-  
+
   return defaultLocale
 }
 
@@ -66,7 +67,7 @@ export const getLocaleMessages = (locale) => {
  */
 export const t = (key, params = {}) => {
   if (!key) return ''
-  
+
   // 尝试使用父级项目的i18n
   if (globalApp?.config?.globalProperties?.$t) {
     try {
@@ -78,7 +79,7 @@ export const t = (key, params = {}) => {
       console.warn('[TinySearchBox] i18n translation failed:', error)
     }
   }
-  
+
   // 尝试使用Vue实例的$t方法
   if (globalApp?.$t) {
     try {
@@ -90,15 +91,15 @@ export const t = (key, params = {}) => {
       console.warn('[TinySearchBox] i18n translation failed:', error)
     }
   }
-  
+
   // 使用默认语言包
   const locale = getCurrentLocale()
   const messages = getLocaleMessages(locale)
-  
+
   // 解析key路径
   const keys = key.split('.')
   let result = messages
-  
+
   for (const k of keys) {
     if (result && typeof result === 'object' && k in result) {
       result = result[k]
@@ -121,14 +122,14 @@ export const t = (key, params = {}) => {
       break
     }
   }
-  
+
   // 处理参数替换
   if (typeof result === 'string' && Object.keys(params).length > 0) {
     return result.replace(/\{(\w+)\}/g, (match, paramKey) => {
       return params[paramKey] !== undefined ? params[paramKey] : match
     })
   }
-  
+
   return typeof result === 'string' ? result : key
 }
 
@@ -181,6 +182,8 @@ export const removeLocale = (locale) => {
 // 默认导出
 export default {
   t,
+  zhCN,
+  enUS,
   tArray,
   setGlobalApp,
   getCurrentLocale,

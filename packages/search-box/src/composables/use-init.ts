@@ -53,7 +53,6 @@ export function useInit({ props, state }) {
     } else {
       showDropdown(state)
     }
-    console.info(22222222)
   }
 
   const watchOutsideClick = () => {

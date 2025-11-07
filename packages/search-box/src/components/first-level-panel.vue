@@ -3,7 +3,8 @@
     <tiny-dropdown-item
       v-show="state.inputValue.trim()"
       class="tvp-search-box__filter-item tvp-search-box__dropdown-item tvp-search-box__dropdown-item-init"
-      @click="selectInputValue(state.inputValue)"
+      :item-data="{ label: state.inputValue }"
+      @item-click="() => selectInputValue(state.inputValue)"
     >
       <span> {{ t("tvp.tvpSearchbox.initUse") }}＂{{ state.inputValue }}＂</span>
     </tiny-dropdown-item>
@@ -17,7 +18,8 @@
             v-for="(item, index) in value['attr']"
             :key="item.label + index"
             class="tvp-search-box__filter-item tvp-search-box__dropdown-item"
-            @click="selectPropItem(item)"
+            :item-data="item"
+            @item-click="() => selectPropItem(item)"
           >
             <span>
               <span v-for="text in item.match" :key="text">
@@ -42,7 +44,8 @@
             :key="item.label + index"
             :disabled="item.isChecked"
             class="tvp-search-box__filter-item tvp-search-box__dropdown-item"
-            @click="selectRadioItem(item, true)"
+            :item-data="item"
+            @item-click="() => selectRadioItem(item, true)"
           >
             <span>
               <span v-for="text in item.match" :key="text">
@@ -67,7 +70,8 @@
               v-for="(item, index) in state.potentialOptions"
               :key="item.label + index"
               class="tvp-search-box__filter-item tvp-search-box__dropdown-item"
-              @click="selectRadioItem(item, true)"
+              :item-data="item"
+              @item-click="() => selectRadioItem(item, true)"
             >
               {{ item.label }}：
               <span class="tvp-search-box__text-highlight">{{ item.value }}</span>
@@ -88,7 +92,8 @@
           v-for="(item, index) in group"
           :key="(item.field || item.label) + index"
           class="tvp-search-box__dropdown-item"
-          @click="selectPropItem(item)"
+          :item-data="item"
+          @item-click="() => selectPropItem(item)"
         >
           <span :title="item.label">{{ item.label }}</span>
         </tiny-dropdown-item>
@@ -102,24 +107,27 @@
 import { defineComponent, setup, $props, $prefix } from "@opentiny/vue-common";
 import TinyDropdownItem from "@opentiny/vue-dropdown-item";
 import { t } from "../utils/i18n.ts";
-import "../index.less";
 
 // 简单的 renderless 函数
 const renderless = (props, hooks, { emit }) => {
-  const events = (eventName, p1, p2) => {
-    emit("events", eventName, p1, p2);
-  };
+  // 优先使用传入的 events/handleEvents 函数，如果没有则使用 emit
+  const handleEvents =
+    props.handleEvents ||
+    props.events ||
+    ((eventName, p1, p2) => {
+      emit("events", eventName, p1, p2);
+    });
 
   const selectInputValue = (e) => {
-    events("selectInputValue", e);
+    handleEvents("selectInputValue", e);
   };
 
   const selectPropItem = (e) => {
-    events("selectPropItem", e);
+    handleEvents("selectPropItem", e);
   };
 
   const selectRadioItem = (e, v) => {
-    events("selectRadioItem", e, v);
+    handleEvents("selectRadioItem", e, v);
   };
 
   return {
@@ -147,7 +155,16 @@ export default defineComponent({
       type: Array,
       default: () => [],
     },
+    events: {
+      type: Function,
+      default: null,
+    },
+    handleEvents: {
+      type: Function,
+      default: null,
+    },
   },
+  emits: ["events"],
   setup(props, context) {
     return setup({ props, context, renderless, api });
   },

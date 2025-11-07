@@ -35,7 +35,7 @@ export const resetInput = (state) => {
  * @param newValue 表示替换全部的model-value值
  * @param oldValue 表示旧的model-value值
  */
-export const emitChangeModelEvent = ({ emit, state, ...args }) => {
+export const emitChangeModelEvent = ({ emit, state, nextTick, ...args }) => {
   showPopover(state, false)
   const { tagList = null, index = -1, newTag = null, newValue = null, oldValue = null, isEdit } = args
   if (!isEdit) {
@@ -46,17 +46,23 @@ export const emitChangeModelEvent = ({ emit, state, ...args }) => {
   }
 
   const oldVal = oldValue || deepClone(state.innerModelValue)
+  let innerModelValue = []
+  
   if (newValue) {
-    state.innerModelValue = newValue
+    innerModelValue = [...newValue]
   } else if (index !== -1) {
-    newTag ? state.innerModelValue.splice(index, 1, newTag) : state.innerModelValue.splice(index, 1)
+    innerModelValue = [...state.innerModelValue]
+    newTag ? innerModelValue.splice(index, 1, newTag) : innerModelValue.splice(index, 1)
   } else {
-    state.innerModelValue.push(...tagList)
+    innerModelValue = [...state.innerModelValue, ...tagList]
   }
-  const { innerModelValue } = state
-  console.info('更新',emit,  state, innerModelValue)
-  emit('update:modelValue', innerModelValue)
-  emit('change', deepClone(state.innerModelValue), oldVal)
+  
+  // 直接赋值新数组，确保 Vue 2 和 Vue 3 都能触发响应式更新
+  state.innerModelValue = innerModelValue
+  
+  // 同步emit，确保立即触发 - Vue 2 需要立即更新才能逐步显示
+  emit('update:modelValue', deepClone(innerModelValue))
+  emit('change', deepClone(innerModelValue), oldVal)
 }
 
 /**

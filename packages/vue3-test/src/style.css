@@ -29,7 +29,6 @@ body {
   min-width: 320px;
   min-height: 100vh;
   background: azure;
-
 }
 
 h1 {
@@ -60,10 +59,9 @@ button:focus-visible {
   padding: 2em;
 }
 
-#app {    
+#app {
   width: 100%;
   margin: 0 auto;
-  padding: 2rem;
   text-align: center;
 }
 

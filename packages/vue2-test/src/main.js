@@ -1,44 +1,46 @@
 import Vue from 'vue'
-console.log('Vue===', Vue, Vue.version);
-
+import VueI18n from 'vue-i18n'
 import App from './App.vue'
-// import VueCompositionAPI from '@vue/composition-api'
+import './style.css'
+import TinySearchBox, { zhCN, enUS, setGlobalApp } from '@opentiny/vue-search-box'
+import '@opentiny/vue-search-box-theme'
 
-// Vue.use(VueCompositionAPI)
+// 配置全局变量，用于 @opentiny/vue-common
+// 根据 vite 配置的 process.env.TINY_MODE 动态设置（saas 模式时为 'saas'，否则为 'pc'）
+Vue.prototype.$TINY_MODE = (typeof process !== 'undefined' && process.env && process.env.TINY_MODE) || 'pc'
+Vue.prototype.$TINY_THEME = (typeof process !== 'undefined' && process.env && process.env.TINY_THEME) || 'tiny'
+
+// 配置国际化
+Vue.use(VueI18n)
+
+// 全局混入，确保所有组件实例都有 tiny_mode 配置
+Vue.mixin({
+  provide() {
+    return {
+      tiny_mode: this.$TINY_MODE || 'pc',
+      tiny_theme: this.$TINY_THEME || 'tiny'
+    }
+  }
+})
+
+const i18n = new VueI18n({
+  locale: 'zh-CN',
+  messages: {
+    'zh-CN': zhCN,
+    'en-US': enUS
+  }
+})
 
 
-// 注册 composition-api（在任何组件导入前）
+// 注册 TinySearchBox 组件
+Vue.use(TinySearchBox)
 
-// 全局事件总线，确保所有第三方组件实例都能拿到 $emitter
-// const bus = new Vue()
-// Vue.prototype.$emitter = bus
-// Vue.prototype.$onEmitter = (...args) => bus.$on(...args)
-// Vue.prototype.$offEmitter = (...args) => bus.$off(...args)
-
-// // 添加 OpenTiny 组件需要的全局配置
-// Vue.prototype.$TINY_MODE = 'saas'
-// Vue.prototype.$TINY_THEME = 'tiny'
-
-// // 额外兜底：给每个组件实例在 beforeCreate 阶段补上 this.$emitter
-// Vue.mixin({
-//   beforeCreate() {
-//     if (!this.$emitter) this.$emitter = Vue.prototype.$emitter
-//     if (!this.$TINY_MODE) this.$TINY_MODE = Vue.prototype.$TINY_MODE
-//     if (!this.$TINY_THEME) this.$TINY_THEME = Vue.prototype.$TINY_THEME
-//   }
-// })
-
-import './assets/main.css'
-
-// 导入Vue2版本的TinySearchBox组件
-// import TinySearchBox from '../../search-box/src/index.vue'
-
-// console.info('Vue2 test loaded:', TinySearchBox)
-
-// // 注册组件
-// Vue.component('TinySearchBox', TinySearchBox)
+// 设置全局 app 实例，让 search-box 能使用父级项目的 i18n
+// 注意：Vue2 环境下，传递 i18n 实例而不是 Vue 构造函数
+setGlobalApp({ $i18n: i18n })
 
 const app = new Vue({
+  i18n,
   render: (h) => h(App)
 })
 

@@ -2,7 +2,7 @@ import { hasTagItem, createNewTag, getTagId, emitChangeModelEvent } from '../uti
 import { deepClone, omitObj } from '../utils/index.ts'
 import { showDropdown } from '../utils/dropdown.ts'
 
-export function useCheckbox({ props, state, emit }) {
+export function useCheckbox({ props, state, emit, nextTick }) {
   const selectCheckbox = (confirm: boolean) => {
     showDropdown(state, false)
     const { checkboxGroup, prevItem, propItem } = state
@@ -54,12 +54,15 @@ export function useCheckbox({ props, state, emit }) {
           }
         })
         if (indexList.length) {
-          state.innerModelValue = state.innerModelValue.filter((item, index) => item && !indexList.includes(index))
+          const filtered = state.innerModelValue.filter((item, index) => item && !indexList.includes(index))
+          // 直接通过 newValue 强制同步到 modelValue（Vue2 需要显式触发）
+          emitChangeModelEvent({ emit, state, nextTick, newValue: filtered, oldValue })
+          return
         }
       }
-      emitChangeModelEvent({ emit, state, tagList, oldValue })
+      emitChangeModelEvent({ emit, state, nextTick, tagList, oldValue })
     } else {
-      propItem.label = ''
+      state.propItem = { ...propItem, label: '' }
       state.inputValue = ''
     }
   }

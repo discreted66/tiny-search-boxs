@@ -9,7 +9,8 @@
         v-show="item.includes(state.inputValue)"
         :key="item + index"
         class="tvp-search-box__dropdown-item"
-        @click="setOperator(item)"
+        :item-data="{ label: item }"
+        @item-click="() => setOperator(item)"
       >
         {{ item }}
       </tiny-dropdown-item>
@@ -25,7 +26,8 @@
         :key="index + (item.field || item.label)"
         :disabled="item.isChecked"
         class="tvp-search-box__dropdown-item"
-        @click="selectRadioItem(item)"
+        :item-data="item"
+        @item-click="() => selectRadioItem(item)"
       >
         <span v-if="item.match" :title="item.label">
           <span v-for="text in item.match" :key="text">
@@ -136,10 +138,9 @@
         <div class="tvp-search-box__dropdown-title">
           {{
             state.prevItem.maxTimeLength > 0
-              ? t("tvp.tvpSearchbox.timeLengthTitle").replace(
-                  "{value}",
-                  (state.prevItem.maxTimeLength / 86400000).toFixed(1)
-                )
+              ? t("tvp.tvpSearchbox.timeLengthTitle", {
+                  value: (state.prevItem.maxTimeLength / 86400000).toFixed(1),
+                })
               : t("tvp.tvpSearchbox.rangeDateTitle")
           }}
         </div>
@@ -259,7 +260,8 @@
         :key="item.label + item.value + index"
         :disabled="item.isChecked"
         class="tvp-search-box__dropdown-item"
-        @click="selectFirstMap(item, state.isShowTagKey)"
+        :item-data="item"
+        @item-click="() => selectFirstMap(item, state.isShowTagKey)"
       >
         <span :title="item.label">{{ item.label }}</span>
       </tiny-dropdown-item>
@@ -279,42 +281,42 @@ import TinyInput from "@opentiny/vue-input";
 import TinyButton from "@opentiny/vue-button";
 import TinyLoading from "@opentiny/vue-loading";
 import { t } from "../utils/i18n.ts";
-import "../index.less";
 
 // 简单的 renderless 函数
 const renderless = (props, hooks, { emit }) => {
   const { computed } = hooks;
 
-  const events = (eventName, p1, p2) => {
+  // 优先使用传入的 events/handleEvents 函数，如果没有则使用 emit
+  const handleEvents = props.handleEvents || props.events || ((eventName, p1, p2) => {
     emit("events", eventName, p1, p2);
-  };
+  });
 
   const setOperator = (e) => {
-    events("setOperator", e);
+    handleEvents("setOperator", e);
   };
 
   const selectRadioItem = (e) => {
-    events("selectRadioItem", e);
+    handleEvents("selectRadioItem", e);
   };
 
   const selectCheckbox = (e) => {
-    events("selectCheckbox", e);
+    handleEvents("selectCheckbox", e);
   };
 
   const sizeChange = (e) => {
-    events("sizeChange", e);
+    handleEvents("sizeChange", e);
   };
 
   const onConfirmDate = (e, b) => {
-    events("onConfirmDate", e, b);
+    handleEvents("onConfirmDate", e, b);
   };
 
   const selectFirstMap = (e, b) => {
-    events("selectFirstMap", e, b);
+    handleEvents("selectFirstMap", e, b);
   };
 
   const handleDateShow = (e) => {
-    events("handleDateShow", e);
+    handleEvents("handleDateShow", e);
   };
 
   const isLoading = computed(() => {
@@ -354,6 +356,7 @@ const api = [
 
 export default defineComponent({
   name: $prefix + "SearchBoxSecondLevelPanel",
+  emits: ['events'],
   components: {
     TinyFormItem,
     TinyDropdownItem,
@@ -377,6 +380,14 @@ export default defineComponent({
       default: () => {
         // do nothing.
       },
+    },
+    events: {
+      type: Function,
+      default: null,
+    },
+    handleEvents: {
+      type: Function,
+      default: null,
     },
   },
   setup(props, context) {

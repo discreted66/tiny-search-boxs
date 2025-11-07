@@ -2,11 +2,11 @@ import { showDropdown } from '../utils/dropdown.ts'
 import { getVerifyNumTag } from '../utils/validate.ts'
 import { emitChangeModelEvent } from '../utils/tag.ts'
 
-export function useNumRange({ props, state, t, emit }) {
-  const { instance } = state
+export function useNumRange({ props, state, t, emit, nextTick, vm }) {
+  const instance = vm || state.instance
   const sizeChange = async (confirm: boolean) => {
     if (!confirm) {
-      state.propItem.label = ''
+      state.propItem = { ...state.propItem, label: '' }
       return
     }
 
@@ -15,7 +15,7 @@ export function useNumRange({ props, state, t, emit }) {
       showDropdown(state, false)
       const newValue = props.modelValue.filter((prev) => prev.type !== newTag.type || prev.field !== newTag.field)
       newValue.push(newTag)
-      emitChangeModelEvent({ emit, state, newValue })
+      emitChangeModelEvent({ emit, state, nextTick, newValue })
     } else {
       showDropdown(state)
     }

@@ -1,6 +1,5 @@
 // 导入工具函数和类型
 import { format } from './utils/date.ts'
-import { t } from './index.ts'
 import { useTag } from './composables/use-tag.ts'
 import { useDropdown } from './composables/use-dropdown.ts'
 import { useMatch } from './composables/use-match.ts'
@@ -11,16 +10,14 @@ import { useEdit } from './composables/use-edit.ts'
 import { useCustom } from './composables/use-custom.ts'
 import { useInit } from './composables/use-init.ts'
 // 类型导入 - 兼容 Vue 2 和 Vue 3
-import './index.type.ts'
 import { showDropdown, showPopover } from './utils/dropdown.ts'
 
 import { deepClone } from './utils/index.ts'
 import { resetInput } from './utils/tag.ts'
-import i18n from './utils/i18n.ts'
+import i18n, { t, getCurrentLocale } from './utils/i18n.ts'
 export const api = [
   't',
   'state',
-  'placeholder',
   'isShowClose',
   'showHelp',
   'maxlength',
@@ -50,6 +47,8 @@ export const api = [
 const initState = ({ reactive, computed, api, i18n, watch, props, emit, vm }) => {
   const state = reactive({
     innerModelValue: [...props.modelValue],
+    placeholder: props.emptyPlaceholder || t('tvp.tvpSearchbox.addPlaceholder'),
+    emitter: emit,
     recordItems: [],
     groupItems: {},
     inputValue: '',
@@ -83,7 +82,7 @@ const initState = ({ reactive, computed, api, i18n, watch, props, emit, vm }) =>
     currentModelValueIndex: -1,
     curMinNumVar: '',
     curMaxNumVar: '',
-    instance: vm,
+    instance: null,
     isMouseDown: false,
     currentEditSelectTags: [],
     visible: false,
@@ -112,45 +111,48 @@ export const renderless = (
   const api = {} as any
   const emit = props.emitter ? props.emitter.emit : $emit
   const state = initState({ reactive, computed, api, i18n, watch, props, emit, vm })
-  let placeholder = props.emptyPlaceholder
-  initAllApi({ api, state, t, props, emit, nextTick, vm, computed, placeholder })
-  initWatch({ watch, state, props, api, nextTick })
+  initAllApi({ api, state, t, props, emit, nextTick, vm, computed })
+  initWatch({ watch, state, props, api, nextTick, vm })
+
+  state.instance = vm
 
   // 生命周期
   onMounted(() => {
-    if (typeof document !== 'undefined') {
-      document.addEventListener('click', api.watchOutsideClick)
-      document.addEventListener('mousedown', api.watchMouseDown)
-      document.addEventListener('mousemove', api.watchMouseMove)
+    if (typeof window !== 'undefined') {
+      window.addEventListener('click', api.watchOutsideClick)
+      window.addEventListener('mousedown', api.watchMouseDown)
+      window.addEventListener('mousemove', api.watchMouseMove)
     }
   })
 
   onBeforeUnmount(() => {
-    if (typeof document !== 'undefined') {
-      document.removeEventListener('click', api.watchOutsideClick)
-      document.removeEventListener('mousedown', api.watchMouseDown)
-      document.removeEventListener('mousemove', api.watchMouseMove)
+    if (typeof window !== 'undefined') {
+      window.removeEventListener('click', api.watchOutsideClick)
+      window.removeEventListener('mousedown', api.watchMouseDown)
+      window.removeEventListener('mousemove', api.watchMouseMove)
+      // 清理语言检查定时器
+      if (state.localeCheckInterval) {
+        clearInterval(state.localeCheckInterval)
+        state.localeCheckInterval = null
+      }
     }
   })
-
-  console.log('===========api:', api);
 
   // 暴露给模板的方法
   return api
 }
 
 
-const initAllApi = ({ api, state, t, props, emit, nextTick, vm, computed, placeholder }) => {
+const initAllApi = ({ api, state, t, props, emit, nextTick, vm, computed }) => {
 
-  console.info('vm', vm)
-  const { selectPropItem, selectRadioItem, selectInputValue, createTag, helpClick, setOperator } = useDropdown({ props, emit, state, t, format })
-  const { deleteTag, clearTag, backspaceDeleteTag } = useTag({ props, state, emit })
-  const { editTag, confirmEditTag, selectPropChange, selectItemIsDisable } = useEdit({ props, state, t, nextTick, format, emit })
-  const { handleInput, selectFirstMap } = useMatch({ props, state, emit })
-  const { selectCheckbox } = useCheckbox({ props, state, emit })
-  const { onConfirmDate, handleDateShow, pickerOptions } = useDatePicker({ props, state, emit })
-  const { sizeChange, initFormRule } = useNumRange({ props, state, t, emit })
-  const { handleConfirm, handleEditConfirm } = useCustom({ state, emit })
+  const { selectPropItem, selectRadioItem, selectInputValue, createTag, helpClick, setOperator } = useDropdown({ props, emit, state, t, format, nextTick, vm })
+  const { deleteTag, clearTag, backspaceDeleteTag } = useTag({ props, state, emit, nextTick })
+  const { editTag, confirmEditTag, selectPropChange, selectItemIsDisable } = useEdit({ props, state, t, nextTick, format, emit, vm })
+  const { handleInput, selectFirstMap } = useMatch({ props, state, emit, nextTick })
+  const { selectCheckbox } = useCheckbox({ props, state, emit, nextTick })
+  const { onConfirmDate, handleDateShow, pickerOptions } = useDatePicker({ props, state, emit, nextTick, vm })
+  const { sizeChange, initFormRule } = useNumRange({ props, state, t, emit, nextTick, vm })
+  const { handleConfirm, handleEditConfirm } = useCustom({ state, emit, nextTick })
   const { initItems, watchOutsideClick, watchMouseDown, watchMouseMove, handleClick } = useInit({ props, state })
 
   const isShowClose = computed(() => props.modelValue.length || state.propItem.label || state.inputValue)
@@ -169,10 +171,13 @@ const initAllApi = ({ api, state, t, props, emit, nextTick, vm, computed, placeh
 
 
   const setPlaceholder = (placeholderValue: string) => {
-    placeholder = placeholderValue
+    state.placeholder = placeholderValue
   }
 
+  // 默认显示 addPlaceholder
   if (props.modelValue.length > 0) {
+    setPlaceholder(t('tvp.tvpSearchbox.addPlaceholder'))
+  } else {
     setPlaceholder(t('tvp.tvpSearchbox.addPlaceholder'))
   }
 
@@ -191,7 +196,6 @@ const initAllApi = ({ api, state, t, props, emit, nextTick, vm, computed, placeh
   Object.assign(api, {
     t,
     state,
-    placeholder,
     isShowClose,
     deleteTag,
     editTag,
@@ -217,27 +221,126 @@ const initAllApi = ({ api, state, t, props, emit, nextTick, vm, computed, placeh
     watchOutsideClick,
     watchMouseDown,
     watchMouseMove,
-    // 添加模板需要的其他属性
-    showHelp: props.showHelp,
-    maxlength: props.maxlength,
-    panelMaxHeight: props.panelMaxHeight,
-    editable: props.editable,
-    modelValue: state.innerModelValue,
-    emptyPlaceholder: props.emptyPlaceholder
   })
 }
 
-const initWatch = ({ watch, state, props, api, nextTick }) => {
+const initWatch = ({ watch, state, props, api, nextTick, vm }) => {
+  // 更新 placeholder 的函数
+  const updatePlaceholder = () => {
+    if (state.propItem.label) {
+      const { placeholder, type } = state.prevItem
+      if (placeholder) {
+        api.setPlaceholder(placeholder)
+      } else if (type === 'map') {
+        api.setPlaceholder(t('tvp.tvpSearchbox.tagPlaceholder'))
+      } else if (state.backupList?.length) {
+        api.setPlaceholder(t('tvp.tvpSearchbox.dynamicPlaceholder', { newValue: state.propItem.label }))
+      } else {
+        api.setPlaceholder(t('tvp.tvpSearchbox.addPlaceholder'))
+      }
+    } else {
+      // 默认显示 addPlaceholder
+      api.setPlaceholder(t('tvp.tvpSearchbox.addPlaceholder'))
+    }
+  }
+
+  // 获取当前语言（优先从组件实例获取）
+  const getI18nLocale = () => {
+    // Vue2: 从组件实例获取
+    if (vm?.$i18n?.locale) {
+      return vm.$i18n.locale
+    }
+    // Vue3: 从组件实例获取
+    if (vm?.proxy?.$i18n?.locale) {
+      return vm.proxy.$i18n.locale
+    }
+    // 回退到默认方法
+    return getCurrentLocale()
+  }
+
+  // 监听语言变化，重新设置 placeholder
+  let lastLocale = getI18nLocale()
+
+  // Vue2 环境下，使用 vm.$watch 监听 i18n.locale
+  if (vm?.$i18n) {
+    try {
+      vm.$watch(
+        () => vm.$i18n.locale,
+        (newLocale) => {
+          if (newLocale !== lastLocale) {
+            lastLocale = newLocale
+            updatePlaceholder()
+          }
+        },
+        { immediate: false }
+      )
+    } catch (e) {
+      console.warn('[TinySearchBox] Unable to watch i18n.locale via vm.$watch:', e)
+    }
+  }
+
+  // Vue3 环境下，使用 watch 监听
+  if (vm?.proxy?.$i18n) {
+    try {
+      watch(
+        () => vm.proxy.$i18n.locale,
+        (newLocale) => {
+          if (newLocale !== lastLocale) {
+            lastLocale = newLocale
+            updatePlaceholder()
+          }
+        },
+        { immediate: false }
+      )
+    } catch (e) {
+      console.warn('[TinySearchBox] Unable to watch i18n.locale via watch:', e)
+    }
+  }
+
+  // 备用方案：通过轮询检查语言变化
+  const checkLocaleChange = () => {
+    const currentLocale = getI18nLocale()
+    if (currentLocale !== lastLocale) {
+      lastLocale = currentLocale
+      updatePlaceholder()
+    }
+  }
+
+  // 使用定时器定期检查语言变化，存储在 state 中以便清理（降低频率到 200ms）
+  if (typeof window !== 'undefined') {
+    state.localeCheckInterval = setInterval(checkLocaleChange, 200)
+  }
+
+  // 监听 props.modelValue 变化时也检查语言
+  watch(
+    () => props.modelValue,
+    () => {
+      checkLocaleChange()
+    }
+  )
+
   // 监听器
   watch(
     () => props.items,
     (newVal) => {
+      const wasOpen = state.visible
+      const currentField = state.prevItem && state.prevItem.field
+
       state.recordItems = deepClone(newVal)
       api.initItems()
       api.initFormRule()
       nextTick(() => {
         api.initItems()
         api.initFormRule()
+
+        // 如果二级面板已打开，则保持不关闭并刷新当前字段的选项
+        if (wasOpen && state.propItem.label) {
+          const updated = state.recordItems.find((it) => it.field === currentField) || state.prevItem
+          state.prevItem = updated || {}
+          state.backupList = updated && updated.options ? [...updated.options] : []
+          state.filterList = state.backupList ? [...state.backupList] : []
+          showDropdown(state) // 保持展开
+        }
       })
     },
     {
@@ -247,10 +350,30 @@ const initWatch = ({ watch, state, props, api, nextTick }) => {
   )
 
   watch(
+    () => state.inputValue,
+    (newVal) => {
+      if (!newVal && !state.propItem.type) {
+        state.visible = false
+      }
+    },
+    {
+      immediate: true
+    }
+  )
+
+  watch(
     () => state.popoverVisible,
     (newVal) => {
       if (!newVal && !state.inputEditValue.length) {
-        state.inputEditValue = state.currentEditSelectTags
+        if (state.prevItem && state.prevItem.mergeTag) {
+          state.inputEditValue = Array.isArray(state.currentEditSelectTags)
+            ? state.currentEditSelectTags
+            : []
+        } else {
+          state.inputEditValue = Array.isArray(state.currentEditSelectTags)
+            ? state.currentEditSelectTags.join(',')
+            : (state.currentEditSelectTags || '')
+        }
       }
     },
     {
@@ -261,24 +384,8 @@ const initWatch = ({ watch, state, props, api, nextTick }) => {
   watch(
     () => state.propItem.label,
     (newValue) => {
-      if (newValue) {
-        const { placeholder, type } = state.prevItem
-        if (placeholder) {
-          api.setPlaceholder(placeholder)
-        } else if (type === 'map') {
-          api.setPlaceholder(t('tvp.tvpSearchbox.tagPlaceholder'))
-        } else if (state.backupList?.length) {
-          api.setPlaceholder(t('tvp.tvpSearchbox.dynamicPlaceholder').replace('{newValue}', newValue))
-        } else {
-          api.setPlaceholder(t('tvp.tvpSearchbox.addPlaceholder'))
-        }
-      } else {
-        if (props.modelValue.length > 0) {
-          api.setPlaceholder(t('tvp.tvpSearchbox.addPlaceholder'))
-        } else {
-          api.setPlaceholder(props.emptyPlaceholder)
-        }
-      }
+      // 使用统一的更新函数
+      updatePlaceholder()
     }
   )
 
@@ -301,11 +408,20 @@ const initWatch = ({ watch, state, props, api, nextTick }) => {
         })
         showPopover(state, false)
         if (newVal.length === 0) {
-          api.setPlaceholder(props.emptyPlaceholder)
+          api.setPlaceholder(t('tvp.tvpSearchbox.addPlaceholder'))
         }
 
         if (props.editable && !state.inputEditValue.length && newVal[0]) {
-          state.inputEditValue = newVal[0].value
+          const tag = newVal[0]
+          const prev = state.recordItems.find((it) => it.field === tag.field) || tag
+          if (prev.mergeTag && tag.options) {
+            const labels = tag.options.flatMap((o) => o.label) || []
+            state.inputEditValue = labels
+            state.currentEditSelectTags = labels
+          } else {
+            const v = tag.value
+            state.inputEditValue = Array.isArray(v) ? v.join(',') : (v || '')
+          }
         }
         state.innerModelValue = [...newVal]
       }

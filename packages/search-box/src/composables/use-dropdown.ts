@@ -3,8 +3,8 @@ import { showDropdown } from '../utils/dropdown.ts'
 import { setStateNumRange } from '../utils/validate.ts'
 import { deepClone, omitObj } from '../utils/index.ts'
 
-export function useDropdown({ props, emit, state, t, format }) {
-  const { instance } = state
+export function useDropdown({ props, emit, state, t, format, nextTick, vm }) {
+  const instance = vm || state.instance
   const showValueItem = (item) => {
     const { start, end, type } = item
     state.backupList = item.options
@@ -58,7 +58,9 @@ export function useDropdown({ props, emit, state, t, format }) {
 
   const selectPropItem = (item) => {
     const { field, label } = item
-    state.propItem.label = label
+
+    // 创建新对象而不是直接修改属性，确保 Vue 2 响应式检测
+    state.propItem = { ...state.propItem, label }
 
     emit('first-level-select', field)
 
@@ -97,7 +99,7 @@ export function useDropdown({ props, emit, state, t, format }) {
     const index = indexMap.get(label)
     const id = getTagId(props, prevItem, item)
     const operator = state.operatorValue && operators ? { operator: state.operatorValue } : null
-    let newTag = null as any
+    let newTag = null
 
     if (mergeTag) {
       const options = { label: value, ...id }
@@ -116,16 +118,18 @@ export function useDropdown({ props, emit, state, t, format }) {
       return
     }
     showDropdown(state, false)
-    console.info('newTag', newTag)
+
     const oldValue = deepClone(state.innerModelValue)
+    let newValue = [] as any[]
     if ((replace || mergeTag) && index >= 0) {
-      state.innerModelValue.splice(index, 1)
+      const cloned = [...state.innerModelValue]
+      cloned.splice(index, 1)
+      newValue = [...cloned, newTag]
+    } else {
+      newValue = [...state.innerModelValue, newTag]
     }
-    state.innerModelValue.push(newTag)
-    const newValue = state.innerModelValue
     emitChangeModelEvent({ emit, state, newValue, oldValue })
   }
-
   /**
    * 使用输入选项
    * @param val 输入框的值

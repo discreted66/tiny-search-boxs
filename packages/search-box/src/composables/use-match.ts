@@ -33,7 +33,7 @@ const getHighlightMatch = (labelRegex, label) => {
   return match
 }
 
-export function useMatch({ props, state, emit }) {
+export function useMatch({ props, state, emit, nextTick }) {
   // const loadingInstance = ref(null)
 
   const getMatchList = async (keyword: string) => {
@@ -50,7 +50,8 @@ export function useMatch({ props, state, emit }) {
 
   const handleSearch = (e) => {
     const { recordItems, propItem } = state
-    const inputValue = e.target.value.trim()
+    const raw = typeof e === 'string' ? e : (e && e.target && typeof e.target.value === 'string' ? e.target.value : state.inputValue || '')
+    const inputValue = String(raw).trim()
     const { maxlength } = props
 
     if (maxlength && maxlength < inputValue.length) {
@@ -73,7 +74,7 @@ export function useMatch({ props, state, emit }) {
     const hasItem =
       propItem.label || !value ? null : recordItems.find((item) => item.type === 'map' && patt.test(item.label))
     if (hasItem) {
-      state.propItem.label = hasItem.label
+      state.propItem = { ...state.propItem, label: hasItem.label }
       state.inputValue = ''
       state.prevItem = hasItem
       state.backupPrevItem = hasItem
@@ -161,9 +162,10 @@ export function useMatch({ props, state, emit }) {
     const { prevItem, propItem } = state
     if (options) {
       showDropdown(state, false)
-      state.propItem.value = `${item.label}=`
+      state.propItem = { ...state.propItem, value: `${item.label}=` }
       state.isShowTagKey = false
       state.inputValue = ''
+
       state.backupList = item.options || []
       resetBackupList()
 
@@ -184,7 +186,7 @@ export function useMatch({ props, state, emit }) {
       const id = getTagId(props, prevItem, item)
       const newTag = createNewTag({ type, field, label: propItem.label, value, ...id })
       const tagList = [newTag]
-      emitChangeModelEvent({ emit, state, tagList })
+      emitChangeModelEvent({ emit, state, nextTick, tagList })
     }
     if (isFirst) {
       showDropdown(state)

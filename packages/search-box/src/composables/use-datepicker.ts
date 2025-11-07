@@ -2,11 +2,11 @@ import { showDropdown } from '../utils/dropdown.ts'
 import { getVerifyDateTag } from '../utils/validate.ts'
 import { emitChangeModelEvent } from '../utils/tag.ts'
 
-export function useDatePicker({ props, state, emit }) {
-  const { instance } = state
+export function useDatePicker({ props, state, emit, nextTick, vm }) {
+  const instance = vm || state.instance
   const onConfirmDate = async (confirm: boolean, isDateTimeType = false) => {
     if (!confirm) {
-      state.propItem.label = ''
+      state.propItem = { label: '' }  
 
       return
     }
@@ -15,7 +15,7 @@ export function useDatePicker({ props, state, emit }) {
       showDropdown(state, false)
       const newValue = props.modelValue.filter((prev) => prev.type !== newTag.type || prev.field !== newTag.field)
       newValue.push(newTag)
-      emitChangeModelEvent({ emit, state, newValue })
+      emitChangeModelEvent({ emit, state, nextTick, newValue })
     } else {
       showDropdown(state)
     }

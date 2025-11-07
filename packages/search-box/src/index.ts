@@ -11,9 +11,8 @@
  */
 import { $props, $prefix, $setup, defineComponent, isVue2, isVue3 } from '@opentiny/vue-common'
 import { type PropType } from '@opentiny/vue-common'
-// 临时绕过虚拟模板插件，直接导入Vue组件
-import template from './index.vue'
-import { t, setGlobalApp } from './utils/i18n'
+import template from './pc.vue'
+
 
 export const searchBoxProps = {
   ...$props,
@@ -87,31 +86,12 @@ export const searchBoxProps = {
     default: () => ({})
   }
 }
-// console.info('isVue2', isVue2, 'isVue3', isVue3, '$props', $props, 'template', template)
 // 组件安装函数
-const TinySearchBox = defineComponent({
+export default defineComponent({
   name: $prefix + 'SearchBox',
   props: searchBoxProps,
   ...template
-  // setup(props, context) {
-  //   return $setup({ props, context, template })
-  // }
 })
 
-// 安装插件
-TinySearchBox.install = (app) => {
-  // 设置全局应用实例，用于i18n
-  setGlobalApp(app)
 
-  // 注册组件
-  app.component(TinySearchBox.name, TinySearchBox)
-}
 
-// 导出
-export { TinySearchBox, t, setGlobalApp }
-export * from './utils/i18n'
-export * from './index.type'
-export * from './utils/zh_CN'
-export * from './utils/en_US'
-
-export default TinySearchBox

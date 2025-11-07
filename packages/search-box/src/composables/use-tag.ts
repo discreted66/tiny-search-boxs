@@ -2,7 +2,7 @@ import { showDropdown } from '../utils/dropdown.ts'
 import { emitChangeModelEvent } from '../utils/tag.ts'
 import { deepClone } from '../utils/index.ts'
 
-export function useTag({ props, state, emit }) {
+export function useTag({ props, state, emit, nextTick }) {
   let lastInputValue = deepClone(state.inputValue)
 
   const changeIsChecked = (tag) => {
@@ -19,7 +19,7 @@ export function useTag({ props, state, emit }) {
     showDropdown(state, false)
     changeIsChecked(tag)
     const newValue = props.modelValue.filter((item) => item !== tag)
-    emitChangeModelEvent({ emit, state, newValue })
+    emitChangeModelEvent({ emit, state, nextTick, newValue })
   }
 
   const clearTag = () => {
@@ -27,7 +27,7 @@ export function useTag({ props, state, emit }) {
     props.modelValue.forEach((item) => changeIsChecked(item))
     state.propItem = {}
     state.inputValue = ''
-    emitChangeModelEvent({ emit, state, newValue: [] })
+    emitChangeModelEvent({ emit, state, nextTick, newValue: [] })
     emit('clear')
   }
 
@@ -44,10 +44,12 @@ export function useTag({ props, state, emit }) {
       const lastIndex = props.modelValue.length - 1
       changeIsChecked(props.modelValue[lastIndex])
       const newValue = state.innerModelValue.slice(0, props.modelValue.length - 1)
-      emitChangeModelEvent({ emit, state, newValue })
+      emitChangeModelEvent({ emit, state, nextTick, newValue })
     }
     lastInputValue = state.inputValue
-    state?.instance?.refs?.inputRef.$el.click()
+    if (state?.instance?.refs?.inputRef?.$el) {
+      state.instance.refs.inputRef.$el.click()
+    }
   }
 
   return {

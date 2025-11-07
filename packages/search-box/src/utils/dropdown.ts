@@ -4,7 +4,6 @@
  * @param isShow 是否展示下拉框, 默认展示
  */
 export const showDropdown = (state, isShow = true) => {
-  console.info('弹窗', state, isShow)
   if (isShow) {
     state.visibleTimer = setTimeout(() => {
       state.visible = true
@@ -22,9 +21,10 @@ export const showDropdown = (state, isShow = true) => {
  * @param isShow 是否展示编辑下拉框, 默认展示
  */
 export const showPopover = (state, isShow = true) => {
-  console.info('showPopover', state, isShow)
+  if (!state.instance) return
   state.popoverVisible = isShow
-  const { dropdownRef } = state
+  const { dropdownRef } = state.instance
+
   if (isShow && dropdownRef.state.visible) {
     clearTimeout(Number(dropdownRef.state.timeout))
     dropdownRef.state.timeout = null

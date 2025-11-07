@@ -1,15 +1,7 @@
 <template>
-  <!-- <div class="tvp-search-box" @click.stop="showPopover(state, false)"> -->
-  <div class="tvp-search-box">
-    <tiny-input
-      ref="inputRef"
-      v-model="state.inputValue"
-      class="tvp-search-box__input"
-      tiny_mode="pc"
-    ></tiny-input>
-    {{ state.inputValue }}
+  <div class="tvp-search-box" @click.stop="showPopover(state, false)">
+    <tiny-icon-search class="tvp-search-box__prefix" />
     <tiny-tag
-  
       v-for="(tag, index) in modelValue"
       :key="tag.field + index"
       closable
@@ -24,7 +16,6 @@
       </span>
     </tiny-tag>
     <span v-if="modelValue.length" class="tvp-search-box__placeholder"></span>
-
     <tiny-form
       ref="formRef"
       :model="state"
@@ -56,7 +47,7 @@
             ref="inputRef"
             v-model="state.inputValue"
             class="tvp-search-box__input"
-            :placeholder="placeholder"
+            :placeholder="state.placeholder"
             :maxlength="maxlength && maxlength + 1"
             @keydown.delete.stop="backspaceDeleteTag"
             @keydown.enter.stop="createTag"
@@ -107,7 +98,7 @@
                 <TinySearchBoxFirstLevelPanel
                   v-else
                   :state="state"
-                  @events="handleEvents"
+                  :handleEvents="handleEvents"
                 ></TinySearchBoxFirstLevelPanel>
               </div>
               <div v-show="state.propItem.label">
@@ -388,15 +379,10 @@
         </tiny-popover>
       </template>
     </tiny-form>
-    <div>{{ state.groupItems['0'].map(item => item.label).join(', ') }}</div>
-    <div>
-      <tiny-input v-model="state.inputValue" placeholder="Please input"></tiny-input>
-      <tiny-button type="primary">提交</tiny-button>
-    </div>
   </div>
 </template>
 
-<script>
+<script lang="ts">
 // Vue2 版本，使用 tiny-vue 的 renderless 架构
 import { defineComponent, setup, $props, isVue2 } from "@opentiny/vue-common";
 import { renderless, api } from "./renderless.ts";
@@ -406,7 +392,6 @@ import TinyInput from "@opentiny/vue-input";
 import TinyDropdown from "@opentiny/vue-dropdown";
 import TinyDropdownMenu from "@opentiny/vue-dropdown-menu";
 import TinyButton from "@opentiny/vue-button";
-import TinyButtonGroup from "@opentiny/vue-button-group";
 import TinyTooltip from "@opentiny/vue-tooltip";
 import TinyDatePicker from "@opentiny/vue-date-picker";
 import TinyForm from "@opentiny/vue-form";
@@ -419,30 +404,12 @@ import { iconSearch, iconClose, iconHelpQuery } from "@opentiny/vue-icon";
 
 import TinySearchBoxFirstLevelPanel from "./components/first-level-panel.vue";
 import TinySearchBoxSecondLevelPanel from "./components/second-level-panel.vue";
-import "./index.less";
+import "../../search-box/theme/index.less";
 
 export default defineComponent({
-  name: "TinySearchBox",
-  components: {
-    TinyTag,
-    TinyInput,
-    TinyDropdown,
-    TinyDropdownMenu,
-    TinyButton,
-    TinyButtonGroup,
-    TinyTooltip,
-    TinyDatePicker,
-    TinyForm,
-    TinyFormItem,
-    TinyPopover,
-    TinySelect,
-    TinyOption,
-    TinySearchBoxFirstLevelPanel,
-    TinySearchBoxSecondLevelPanel,
-    // 图标组件
-    TinyIconSearch: iconSearch(),
-    TinyIconClose: iconClose(),
-    TinyIconHelpQuery: iconHelpQuery(),
+  model: {
+    prop: "modelValue",
+    event: "update:modelValue",
   },
   props: {
     ...$props,
@@ -503,6 +470,26 @@ export default defineComponent({
     "first-level-select",
     "clear",
   ],
+  components: {
+    TinyTag,
+    TinyInput,
+    TinyDropdown,
+    TinyDropdownMenu,
+    TinyButton,
+    TinyTooltip,
+    TinyDatePicker,
+    TinyForm,
+    TinyFormItem,
+    TinyPopover,
+    TinySelect,
+    TinyOption,
+    TinySearchBoxFirstLevelPanel,
+    TinySearchBoxSecondLevelPanel,
+    // 图标组件
+    TinyIconSearch: iconSearch(),
+    TinyIconClose: iconClose(),
+    TinyIconHelpQuery: iconHelpQuery(),
+  },
   setup(props, context) {
     return setup({ props, context, renderless, api });
   },

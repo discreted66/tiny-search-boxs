@@ -1,19 +1,28 @@
 import { createApp } from 'vue'
+import { createI18n } from 'vue-i18n'
 import './style.css'
 import App from './App.vue'
-import TinySearchBox from '@opentiny/vue-search-box'
-// import TinySearchBox from '../../search-box/dist/vue3/es/index.vue3.es.js'
-// import { install, isVue2, isVue3 } from 'vue-demi';
-// install(); // 强制启用 Vue 2 模式
-// import '@discreted/vue-search-box/dist/index.css';
-// import TinySearchBox, { zhCN, enUS } from './dist/es/index.es';
-// import './dist/d/index.css';
+import TinySearchBox, { zhCN, enUS, setGlobalApp } from '@opentiny/vue-search-box'
+import '@opentiny/vue-search-box-theme'
 
-// console.info('isVue2',isVue2, '================isVue3',isVue3)
-console.info('TinySearchBox', TinySearchBox)
+// 配置国际化
+const i18n = createI18n({
+  legacy: false,
+  locale: 'zh-CN',
+  messages: {
+    'zh-CN': zhCN,
+    'en-US': enUS
+  }
+})
 
 const app = createApp(App)
-app.use(TinySearchBox)
-console.info(TinySearchBox, app?.config?.globalProperties?.$t)
 
+// 使用 i18n
+app.use(i18n)
+
+// 使用 TinySearchBox
+app.use(TinySearchBox)
+
+// 设置全局 app 实例，让 search-box 能使用父级项目的 i18n
+setGlobalApp(app)
 app.mount('#app')
