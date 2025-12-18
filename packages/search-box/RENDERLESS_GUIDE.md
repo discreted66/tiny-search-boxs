@@ -326,7 +326,9 @@ export const renderless = (props, hooks, { vm }) => {
 - Vue 3：`vm.refs.inputRef`
 - `vue-common` 提供统一的访问方式，自动适配
 
-### 📊 vue-common 提供的完整 API 列表
+### 📊 vue-common 提供的常用 API 列表
+
+#### 核心 API（必须掌握）
 
 | API               | 作用            | Vue 2 实现               | Vue 3 实现          |
 | ----------------- | --------------- | ------------------------ | ------------------- |
@@ -336,6 +338,93 @@ export const renderless = (props, hooks, { vm }) => {
 | `$prefix`         | 组件前缀        | 字符串常量               | 字符串常量          |
 | `isVue2`          | Vue 2 检测      | `true`                   | `false`             |
 | `isVue3`          | Vue 3 检测      | `false`                  | `true`              |
+
+#### 响应式 API（通过 hooks 获取）
+
+在 `renderless` 函数的第二个参数 `hooks` 中提供，这些 API 在 Vue 2 和 Vue 3 中都能使用：
+
+| API                  | 作用           | 使用场景                 |
+| -------------------- | -------------- | ------------------------ |
+| `reactive`           | 创建响应式对象 | 创建组件的状态对象       |
+| `computed`           | 计算属性       | 派生状态、格式化数据     |
+| `watch`              | 监听器         | 监听数据变化，执行副作用 |
+| `ref`                | 响应式引用     | 创建单个值的响应式引用   |
+| `onMounted`          | 挂载钩子       | 组件挂载后执行的操作     |
+| `onBeforeUnmount`    | 卸载前钩子     | 组件卸载前清理资源       |
+| `onUpdated`          | 更新钩子       | 组件更新后执行的操作     |
+| `getCurrentInstance` | 获取实例       | 获取当前组件实例         |
+
+**使用示例**：
+
+```typescript
+export const renderless = (props, hooks, context) => {
+  const { reactive, computed, watch, onMounted, onBeforeUnmount } = hooks
+
+  // 创建响应式状态
+  const state = reactive({ count: 0 })
+
+  // 计算属性
+  const double = computed(() => state.count * 2)
+
+  // 监听器
+  watch(
+    () => state.count,
+    (newVal) => {
+      console.log('count changed:', newVal)
+    }
+  )
+
+  // 生命周期
+  onMounted(() => {
+    console.log('组件已挂载')
+  })
+
+  onBeforeUnmount(() => {
+    console.log('组件即将卸载')
+  })
+
+  return api
+}
+```
+
+#### 工具 API
+
+| API                    | 作用          | 使用场景                    |
+| ---------------------- | ------------- | --------------------------- |
+| `nextTick`             | 等待 DOM 更新 | 在 DOM 更新后执行操作       |
+| `h`                    | 渲染函数      | 动态创建 VNode              |
+| `Teleport`             | 传送组件      | 将内容渲染到 DOM 的其他位置 |
+| `KeepAlive`            | 缓存组件      | 缓存组件状态                |
+| `defineAsyncComponent` | 异步组件      | 按需加载组件                |
+| `useRouter`            | 路由相关      | 获取路由和路由实例          |
+| `emitter`              | 事件发射器    | 组件间通信                  |
+
+**使用示例**：
+
+```typescript
+// nextTick - 在 renderless 的 context 中提供
+export const renderless = (props, hooks, { nextTick }) => {
+  const updateDOM = async () => {
+    state.data = newData
+    await nextTick() // 等待 DOM 更新
+    // 此时可以安全地操作 DOM
+  }
+}
+
+// h - 渲染函数
+import { h } from '@opentiny/vue-common'
+
+const renderButton = () => {
+  return h('button', { onClick: handleClick }, '点击我')
+}
+
+// useRouter - 路由相关
+import { useRouter } from '@opentiny/vue-common'
+
+const { route, router } = useRouter()
+console.log('当前路由:', route.path)
+router.push('/new-path')
+```
 
 ### 🎯 使用 vue-common 的最佳实践
 
