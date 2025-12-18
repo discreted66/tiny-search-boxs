@@ -4,17 +4,17 @@
 
 ## 📚 目录
 
-- [什么是 Renderless 架构？](#什么是-renderless-架构)
-- [为什么需要 Renderless？](#为什么需要-renderless)
-- [核心概念](#核心概念)
-- [实战演练：从零开始改造组件](#实战演练从零开始改造组件)
-- [进阶技巧](#进阶技巧)
+- [开篇：什么是 Renderless 架构？](#开篇什么是-renderless-架构)
+- [第一步：理解 @opentiny/vue-common（必须先掌握）](#第一步理解-opentinyvue-common必须先掌握)
+- [第二步：核心概念 - 三大文件](#第二步核心概念---三大文件)
+- [第三步：实战演练 - 从零开始改造组件](#第三步实战演练---从零开始改造组件)
+- [第四步：进阶技巧](#第四步进阶技巧)
 - [常见问题与解决方案](#常见问题与解决方案)
 - [最佳实践](#最佳实践)
 
 ---
 
-## 什么是 Renderless 架构？
+## 开篇：什么是 Renderless 架构？
 
 ### 🤔 传统组件的困境
 
@@ -63,11 +63,7 @@ Renderless 架构将组件拆分成三个部分：
 
 **核心思想**：将 UI（模板）和逻辑（业务代码）完全分离，逻辑层使用 Vue 2 和 Vue 3 都兼容的 API。
 
----
-
-## 为什么需要 Renderless？
-
-### 📊 对比表
+### 📊 为什么需要 Renderless？
 
 | 特性       | 传统组件 | Renderless 组件 |
 | ---------- | -------- | --------------- |
@@ -86,7 +82,36 @@ Renderless 架构将组件拆分成三个部分：
 
 ---
 
-## @opentiny/vue-common：兼容层的魔法师 🪄
+## 第一步：理解 @opentiny/vue-common（必须先掌握）
+
+### ⚠️ 重要提示：为什么必须先学习 vue-common？
+
+在学习 Renderless 架构之前，**你必须先理解 `@opentiny/vue-common`**，因为：
+
+1. **它是基础工具**：Renderless 架构完全依赖 `vue-common` 提供的兼容层
+2. **它是桥梁**：没有 `vue-common`，就无法实现 Vue 2/3 的兼容
+3. **它是前提**：不理解 `vue-common`，就无法理解 Renderless 的工作原理
+
+**打个比方**：`vue-common` 就像是你学开车前必须先了解的"方向盘、刹车、油门"，而 Renderless 是"如何驾驶"的技巧。没有基础工具，再好的技巧也无法施展！
+
+### 🤔 为什么需要 vue-common？
+
+想象一下，Vue 2 和 Vue 3 就像两个说不同方言的人：
+
+- **Vue 2**：`this.$refs.input`、`this.$emit('event')`、`Vue.component()`
+- **Vue 3**：`refs.input`、`emit('event')`、`defineComponent()`
+
+如果你要同时支持两者，难道要写两套代码吗？**当然不！** 这就是 `@opentiny/vue-common` 存在的意义。
+
+### ✨ vue-common 是什么？
+
+`@opentiny/vue-common` 是一个**兼容层库**，它：
+
+1. **统一 API**：提供一套统一的 API，自动适配 Vue 2 和 Vue 3
+2. **隐藏差异**：让你无需关心底层是 Vue 2 还是 Vue 3
+3. **类型支持**：提供完整的 TypeScript 类型定义
+
+**简单来说**：`vue-common` 是一个"翻译官"，它让 Vue 2 和 Vue 3 能够"说同一种语言"。
 
 ### 🤔 为什么需要 vue-common？
 
@@ -372,11 +397,35 @@ export const renderless = (props, hooks, { vm }) => {
 
 **记住**：使用 Renderless 架构时，**必须**使用 `vue-common` 提供的 API，这是实现跨版本兼容的关键！
 
+### 🎓 学习检查点
+
+在继续学习之前，请确保你已经理解：
+
+- ✅ `defineComponent` 的作用和用法
+- ✅ `setup` 函数如何连接 renderless
+- ✅ `$props` 和 `$prefix` 的用途
+- ✅ `vue-common` 如何实现 Vue 2/3 兼容
+
+如果你对以上内容还有疑问，请重新阅读本节。**理解 `vue-common` 是学习 Renderless 的前提！**
+
 ---
 
-## 核心概念
+## 第二步：核心概念 - 三大文件
 
-### 1. 三大核心文件
+现在你已经理解了 `vue-common`，我们可以开始学习 Renderless 架构的核心了！
+
+### 📋 文件结构
+
+一个标准的 Renderless 组件包含三个核心文件：
+
+```
+my-component/
+├── index.ts          # 入口文件：定义组件和 props
+├── pc.vue            # 模板文件：只负责 UI 展示
+└── renderless.ts     # 逻辑文件：处理所有业务逻辑
+```
+
+### 1. 三大核心文件详解
 
 #### 📄 `index.ts` - 组件入口
 
@@ -504,7 +553,14 @@ export const renderless = (props, { reactive, computed, watch, onMounted }, { em
 
 ---
 
-## 实战演练：从零开始改造组件
+## 第三步：实战演练 - 从零开始改造组件
+
+现在你已经掌握了：
+
+- ✅ `vue-common` 的核心 API
+- ✅ Renderless 架构的三大文件
+
+让我们通过一个完整的例子，将理论知识转化为实践！
 
 ### 🎯 目标
 
@@ -687,7 +743,9 @@ export default defineComponent({
 
 ---
 
-## 进阶技巧
+## 第四步：进阶技巧
+
+恭喜你！如果你已经完成了实战演练，说明你已经掌握了 Renderless 架构的基础。现在让我们学习一些进阶技巧，让你的组件更加优雅和强大。
 
 ### 1. 模块化：使用 Composables
 
