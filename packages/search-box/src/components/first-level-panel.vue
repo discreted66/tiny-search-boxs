@@ -116,7 +116,7 @@
 <script>
 // Vue2 版本，使用 tiny-vue 的 renderless 架构
 import { defineComponent, setup, $props, $prefix } from '@opentiny/vue-common'
-import TinyDropdownItem from '@opentiny/vue-dropdown-item'
+import { TinyDropdownItem } from '@opentiny/vue'
 import { t } from '../utils/i18n.ts'
 
 // 简单的 renderless 函数
