@@ -104,6 +104,7 @@ export default defineConfig({
           { text: '时间长度限制', link: '/examples/max-time-length' },
           { text: '日期选择器配置', link: '/examples/picker-options' },
           { text: '合并多选标签', link: '/examples/merge-tag' },
+          { text: '禁止删除标签', link: '/examples/disable-tag-delete' },
           { text: '面板最大高度', link: '/examples/panel-max-height' },
           { text: '虚拟滚动', link: '/examples/virtual-scroll' },
           { text: '潜在匹配项', link: '/examples/potential-match' },
